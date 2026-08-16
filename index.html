@@ -12,12 +12,6 @@
   <!-- Babel para JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Lucide Icons desde CDN -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
     
@@ -43,26 +37,286 @@
     .font-mono {
       font-family: 'JetBrains Mono', monospace;
     }
+    
+    /* Utilidades de flexbox */
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .items-start { align-items: flex-start; }
+    .items-baseline { align-items: baseline; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-around { justify-content: space-around; }
+    .flex-1 { flex: 1; }
+    .gap-1 { gap: 4px; }
+    .gap-1\.5 { gap: 6px; }
+    .gap-2 { gap: 8px; }
+    .gap-2\.5 { gap: 10px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
+    .gap-5 { gap: 20px; }
+    
+    /* Utilidades de grid */
+    .grid { display: grid; }
+    .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    
+    /* Utilidades de spacing */
+    .px-2 { padding-left: 8px; padding-right: 8px; }
+    .px-3 { padding-left: 12px; padding-right: 12px; }
+    .px-3\.5 { padding-left: 14px; padding-right: 14px; }
+    .px-4 { padding-left: 16px; padding-right: 16px; }
+    .px-5 { padding-left: 20px; padding-right: 20px; }
+    .px-6 { padding-left: 24px; padding-right: 24px; }
+    
+    .py-0\.5 { padding-top: 2px; padding-bottom: 2px; }
+    .py-1 { padding-top: 4px; padding-bottom: 4px; }
+    .py-1\.5 { padding-top: 6px; padding-bottom: 6px; }
+    .py-2 { padding-top: 8px; padding-bottom: 8px; }
+    .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
+    .py-3 { padding-top: 12px; padding-bottom: 12px; }
+    .py-3\.5 { padding-top: 14px; padding-bottom: 14px; }
+    .py-10 { padding-top: 40px; padding-bottom: 40px; }
+    
+    .pt-1 { padding-top: 4px; }
+    .pt-2 { padding-top: 8px; }
+    .pt-3 { padding-top: 12px; }
+    .pt-4 { padding-top: 16px; }
+    
+    .pb-1 { padding-bottom: 4px; }
+    .pb-3 { padding-bottom: 12px; }
+    .pb-6 { padding-bottom: 24px; }
+    
+    .mt-1 { margin-top: 4px; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .mt-5 { margin-top: 20px; }
+    
+    .mb-2 { margin-bottom: 8px; }
+    .mb-3 { margin-bottom: 12px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mb-5 { margin-bottom: 20px; }
+    
+    /* Utilidades de texto */
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    
+    /* Utilidades de posición */
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-x-auto { overflow-x: auto; }
+    .overflow-y-auto { overflow-y: auto; }
+    .shrink-0 { flex-shrink: 0; }
+    
+    /* Utilidades de forma */
+    .rounded-lg { border-radius: 8px; }
+    .rounded-xl { border-radius: 12px; }
+    .rounded-2xl { border-radius: 20px; }
+    .rounded-full { border-radius: 50%; }
+    .rounded-md { border-radius: 6px; }
+    
+    /* Utilidades de tamaño */
+    .w-full { width: 100%; }
+    .min-h-screen { min-height: 100vh; }
+    .h-full { height: 100%; }
+    
+    /* Estilos para iconos SVG */
+    .icon {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
   <div id="root"></div>
   
   <script type="text/babel">
-    const { useState, Fragment } = React;
+    const { useState, Fragment, createElement } = React;
     
-    // Lucide icons
-    const {
-      Home, Store, RefreshCw, Wallet, User, Bell, ShieldCheck,
-      ArrowUpRight, ArrowDownRight, ChevronRight, MessageCircle, Copy,
-      CheckCircle2, Clock, Filter, Search, Lock, Unlock, Megaphone,
-      Fingerprint, Settings, LogOut, ChevronLeft, Wifi, Signal, BatteryFull,
-      Send, Paperclip, ShieldAlert, Landmark, Smartphone
-    } = lucide;
-    
-    // Alias para WalletIcon
-    const WalletIcon = Wallet;
-    const PhoneIcon = Smartphone;
+    /* =========================================================
+       ICONOS SVG INLINE
+    ========================================================= */
+    const Icon = {
+      Home: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      ),
+      Store: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M3 9l1.5-5h15L21 9"/>
+          <path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/>
+          <path d="M3 9h18"/>
+          <path d="M9 20v-6h6v6"/>
+        </svg>
+      ),
+      RefreshCw: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      ),
+      Wallet: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+          <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+          <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+        </svg>
+      ),
+      User: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      ),
+      Bell: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+        </svg>
+      ),
+      ShieldCheck: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+      ),
+      ShieldAlert: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      ),
+      ArrowUpRight: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <line x1="7" y1="17" x2="17" y2="7"/>
+          <polyline points="7 7 17 7 17 17"/>
+        </svg>
+      ),
+      ArrowDownRight: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <line x1="7" y1="7" x2="17" y2="17"/>
+          <polyline points="17 7 17 17 7 17"/>
+        </svg>
+      ),
+      ChevronRight: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      ),
+      MessageCircle: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+      ),
+      Copy: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+      ),
+      CheckCircle2: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      ),
+      Clock: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      ),
+      Filter: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+      ),
+      Lock: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      ),
+      Unlock: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+        </svg>
+      ),
+      Megaphone: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="m3 11 18-5v12L3 14v-3z"/>
+          <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+        </svg>
+      ),
+      Fingerprint: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
+          <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
+          <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
+          <path d="M2 12a10 10 0 0 1 18-6"/>
+          <path d="M2 16h.01"/>
+          <path d="M21.8 16c.2-2 .131-5.354 0-6"/>
+          <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/>
+          <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
+          <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+        </svg>
+      ),
+      Settings: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <line x1="4" y1="21" x2="4" y2="14"/>
+          <line x1="4" y1="10" x2="4" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12" y2="3"/>
+          <line x1="20" y1="21" x2="20" y2="16"/>
+          <line x1="20" y1="12" x2="20" y2="3"/>
+          <line x1="1" y1="14" x2="7" y2="14"/>
+          <line x1="9" y1="8" x2="15" y2="8"/>
+          <line x1="17" y1="16" x2="23" y2="16"/>
+        </svg>
+      ),
+      LogOut: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      ),
+      Wifi: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+          <line x1="12" y1="20" x2="12.01" y2="20"/>
+        </svg>
+      ),
+      Signal: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <path d="M2 20h.01"/>
+          <path d="M7 20v-4"/>
+          <path d="M12 20v-8"/>
+          <path d="M17 20V8"/>
+          <path d="M22 4v16"/>
+        </svg>
+      ),
+      BatteryFull: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
+        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+          <rect x="1" y="6" width="18" height="12" rx="2" ry="2"/>
+          <line x1="23" y1="13" x2="23" y2="11"/>
+          <line x1="3" y1="10" x2="3" y2="14"/>
+          <line x1="6" y1="10" x2="6" y2="14"/>
+          <line x1="9" y1="10" x2="9" y2="14"/>
+          <line x1="12" y1="10" x2="12" y2="14"/>
+        </svg>
+      ),
+    };
 
     /* ---------------------------------------------------------------
        TOKENS — Cosmo Link / Link P2P
@@ -130,9 +384,9 @@
         <div className="flex items-center justify-between px-6 pt-3 pb-1 font-mono" style={{ color: C.text, fontSize: 12 }}>
           <span>9:41</span>
           <div className="flex items-center gap-1">
-            <Signal size={13} />
-            <Wifi size={13} />
-            <BatteryFull size={14} />
+            <Icon.Signal size={13} color={C.text} />
+            <Icon.Wifi size={13} color={C.text} />
+            <Icon.BatteryFull size={14} color={C.text} />
           </div>
         </div>
       );
@@ -180,9 +434,9 @@
     ========================================================= */
     function ScreenInicio({ goTo }) {
       const actividad = [
-        { nick: "MayelinCUP", tipo: "Compra", monto: "250.00 USDT", estado: "Liberado", tono: "green", icon: ArrowDownRight },
-        { nick: "Ody_Pro", tipo: "Venta", monto: "120.00 USDT", estado: "En curso", tono: "blue", icon: Clock },
-        { nick: "Havana_Trade", tipo: "Venta", monto: "80.00 USDT", estado: "Cancelada", tono: "red", icon: ArrowUpRight },
+        { nick: "MayelinCUP", tipo: "Compra", monto: "250.00 USDT", estado: "Liberado", tono: "green", icon: Icon.ArrowDownRight },
+        { nick: "Ody_Pro", tipo: "Venta", monto: "120.00 USDT", estado: "En curso", tono: "blue", icon: Icon.Clock },
+        { nick: "Havana_Trade", tipo: "Venta", monto: "80.00 USDT", estado: "Cancelada", tono: "red", icon: Icon.ArrowUpRight },
       ];
       return (
         <div className="px-5 pb-6">
@@ -191,14 +445,14 @@
               <p className="font-body" style={{ color: C.textDim, fontSize: 12 }}>Bienvenido de nuevo</p>
               <div className="flex items-center gap-1.5">
                 <h1 className="font-display" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Ody_Pro</h1>
-                <ShieldCheck size={15} color={C.green} />
+                <Icon.ShieldCheck size={15} color={C.green} />
               </div>
             </div>
             <button
               className="flex items-center justify-center rounded-full"
-              style={{ width: 36, height: 36, background: C.surface, border: `1px solid ${C.border}` }}
+              style={{ width: 36, height: 36, background: C.surface, border: `1px solid ${C.border}`, cursor: 'pointer' }}
             >
-              <Bell size={16} color={C.textDim} />
+              <Icon.Bell size={16} color={C.textDim} />
             </button>
           </div>
 
@@ -226,14 +480,14 @@
             <div className="grid grid-cols-2 gap-2 mt-4">
               <div className="rounded-xl px-3 py-2" style={{ background: C.bg, border: `1px solid ${C.borderSoft}` }}>
                 <div className="flex items-center gap-1">
-                  <Unlock size={11} color={C.green} />
+                  <Icon.Unlock size={11} color={C.green} />
                   <span className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>Disponible</span>
                 </div>
                 <span className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>4,000.00</span>
               </div>
               <div className="rounded-xl px-3 py-2" style={{ background: C.bg, border: `1px solid ${C.borderSoft}` }}>
                 <div className="flex items-center gap-1">
-                  <Lock size={11} color={C.red} />
+                  <Icon.Lock size={11} color={C.red} />
                   <span className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>Bloqueado</span>
                 </div>
                 <span className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>1,000.00</span>
@@ -248,7 +502,7 @@
               className="rounded-xl py-3.5 flex flex-col items-start px-4"
               style={{ background: C.blueSoft, border: `1px solid ${C.blue}55`, cursor: 'pointer' }}
             >
-              <ArrowDownRight size={17} color={C.blue} />
+              <Icon.ArrowDownRight size={17} color={C.blue} />
               <span className="font-display mt-2" style={{ color: C.text, fontSize: 13.5, fontWeight: 600 }}>Comprar USDT</span>
             </button>
             <button
@@ -256,7 +510,7 @@
               className="rounded-xl py-3.5 flex flex-col items-start px-4"
               style={{ background: C.redSoft, border: `1px solid ${C.red}55`, cursor: 'pointer' }}
             >
-              <ArrowUpRight size={17} color={C.red} />
+              <Icon.ArrowUpRight size={17} color={C.red} />
               <span className="font-display mt-2" style={{ color: C.text, fontSize: 13.5, fontWeight: 600 }}>Vender USDT</span>
             </button>
           </div>
@@ -273,7 +527,7 @@
               <p className="font-body" style={{ color: C.text, fontSize: 13, fontWeight: 600 }}>Reputación de vendedor</p>
               <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>214 operaciones · 3 años en Link P2P</p>
             </div>
-            <ChevronRight size={16} color={C.textFaint} />
+            <Icon.ChevronRight size={16} color={C.textFaint} />
           </div>
 
           {/* Actividad reciente */}
@@ -282,26 +536,29 @@
             <button onClick={() => goTo("operacion")} className="font-body" style={{ color: C.blue, fontSize: 11.5, cursor: 'pointer', background: 'none', border: 'none' }}>Ver todas</button>
           </div>
           <div className="flex flex-col gap-2">
-            {actividad.map((a, i) => (
-              <button
-                key={i}
-                onClick={() => goTo("operacion")}
-                className="rounded-xl p-3 flex items-center gap-3"
-                style={{ background: C.surface, border: `1px solid ${C.border}`, cursor: 'pointer' }}
-              >
-                <div
-                  className="flex items-center justify-center rounded-full"
-                  style={{ width: 34, height: 34, background: C.bg, border: `1px solid ${C.borderSoft}` }}
+            {actividad.map((a, i) => {
+              const ActivityIcon = a.icon;
+              return (
+                <button
+                  key={i}
+                  onClick={() => goTo("operacion")}
+                  className="rounded-xl p-3 flex items-center gap-3"
+                  style={{ background: C.surface, border: `1px solid ${C.border}`, cursor: 'pointer' }}
                 >
-                  <a.icon size={15} color={C.textDim} />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="font-body" style={{ color: C.text, fontSize: 12.5, fontWeight: 600 }}>{a.tipo} · {a.nick}</p>
-                  <p className="font-mono" style={{ color: C.textDim, fontSize: 11 }}>{a.monto}</p>
-                </div>
-                <StatusChip label={a.estado} tone={a.tono} />
-              </button>
-            ))}
+                  <div
+                    className="flex items-center justify-center rounded-full"
+                    style={{ width: 34, height: 34, background: C.bg, border: `1px solid ${C.borderSoft}` }}
+                  >
+                    <ActivityIcon size={15} color={C.textDim} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="font-body" style={{ color: C.text, fontSize: 12.5, fontWeight: 600 }}>{a.tipo} · {a.nick}</p>
+                    <p className="font-mono" style={{ color: C.textDim, fontSize: 11 }}>{a.monto}</p>
+                  </div>
+                  <StatusChip label={a.estado} tone={a.tono} />
+                </button>
+              );
+            })}
           </div>
         </div>
       );
@@ -345,10 +602,10 @@
           <div className="flex items-center gap-2 mb-4 overflow-x-auto">
             <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
               <span className="font-body" style={{ color: C.text, fontSize: 11.5 }}>CUP</span>
-              <ChevronRight size={12} color={C.textFaint} style={{ transform: "rotate(90deg)" }} />
+              <Icon.ChevronRight size={12} color={C.textFaint} style={{ transform: "rotate(90deg)" }} />
             </button>
             <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
-              <Filter size={11} color={C.textDim} />
+              <Icon.Filter size={11} color={C.textDim} />
               <span className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Monto</span>
             </button>
             <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
@@ -428,7 +685,7 @@
                       border: `1px solid ${i <= pasoActual ? C.blue : C.border}`,
                     }}
                   >
-                    {i < pasoActual ? <CheckCircle2 size={12} /> : i + 1}
+                    {i < pasoActual ? <Icon.CheckCircle2 size={12} color="#fff" /> : i + 1}
                   </div>
                   <span className="font-body mt-1" style={{ fontSize: 9, color: i <= pasoActual ? C.textDim : C.textFaint, textAlign: "center" }}>{p}</span>
                 </div>
@@ -479,13 +736,13 @@
           {/* Chat preview */}
           <div className="rounded-2xl p-3.5 mb-5 flex items-center gap-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
             <div className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: C.blueSoft }}>
-              <MessageCircle size={14} color={C.blue} />
+              <Icon.MessageCircle size={14} color={C.blue} />
             </div>
             <div className="flex-1">
               <p className="font-body" style={{ color: C.text, fontSize: 12, fontWeight: 600 }}>Havana_Trade</p>
               <p className="font-body" style={{ color: C.textDim, fontSize: 11 }}>"Envío el comprobante en 2 min…"</p>
             </div>
-            <ChevronRight size={15} color={C.textFaint} />
+            <Icon.ChevronRight size={15} color={C.textFaint} />
           </div>
 
           <div className="flex gap-3">
@@ -505,10 +762,10 @@
     ========================================================= */
     function ScreenBilletera() {
       const historial = [
-        { tipo: "Depósito", monto: "+1,200.00 USDT", icon: ArrowDownRight, tono: "green" },
-        { tipo: "Bloqueo escrow", monto: "-250.00 USDT", icon: Lock, tono: "amber" },
-        { tipo: "Retiro", monto: "-400.00 USDT", icon: ArrowUpRight, tono: "red" },
-        { tipo: "Liberación escrow", monto: "+120.00 USDT", icon: Unlock, tono: "green" },
+        { tipo: "Depósito", monto: "+1,200.00 USDT", icon: Icon.ArrowDownRight, tono: "green" },
+        { tipo: "Bloqueo escrow", monto: "-250.00 USDT", icon: Icon.Lock, tono: "amber" },
+        { tipo: "Retiro", monto: "-400.00 USDT", icon: Icon.ArrowUpRight, tono: "red" },
+        { tipo: "Liberación escrow", monto: "+120.00 USDT", icon: Icon.Unlock, tono: "green" },
       ];
       return (
         <div className="px-5 pb-6">
@@ -522,13 +779,13 @@
             </div>
             <div className="flex items-center gap-2 mt-2 font-mono" style={{ fontSize: 10, color: C.textFaint }}>
               <span>0xA3f1…9C2e</span>
-              <Copy size={11} />
+              <Icon.Copy size={11} color={C.textFaint} />
             </div>
           </div>
 
           <div className="rounded-xl p-3.5 mb-4 flex items-center justify-between" style={{ background: C.redSoft, border: `1px solid ${C.red}44` }}>
             <div className="flex items-center gap-2">
-              <ShieldAlert size={16} color={C.red} />
+              <Icon.ShieldAlert size={16} color={C.red} />
               <div>
                 <p className="font-body" style={{ color: C.text, fontSize: 11.5, fontWeight: 600 }}>BNB para gas bajo</p>
                 <p className="font-mono" style={{ color: C.textDim, fontSize: 10 }}>0.004 BNB disponibles</p>
@@ -558,15 +815,19 @@
 
           <h2 className="font-display mb-2" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>Historial</h2>
           <div className="flex flex-col gap-2">
-            {historial.map((h, i) => (
-              <div key={i} className="rounded-xl p-3 flex items-center gap-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-                <div className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: C.bg, border: `1px solid ${C.borderSoft}` }}>
-                  <h.icon size={14} color={h.tono === "green" ? C.green : h.tono === "red" ? C.red : C.amber} />
+            {historial.map((h, i) => {
+              const HistoryIcon = h.icon;
+              const iconColor = h.tono === "green" ? C.green : h.tono === "red" ? C.red : C.amber;
+              return (
+                <div key={i} className="rounded-xl p-3 flex items-center gap-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+                  <div className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: C.bg, border: `1px solid ${C.borderSoft}` }}>
+                    <HistoryIcon size={14} color={iconColor} />
+                  </div>
+                  <span className="font-body flex-1" style={{ color: C.text, fontSize: 12.5, fontWeight: 500 }}>{h.tipo}</span>
+                  <span className="font-mono" style={{ color: h.monto[0] === "+" ? C.green : C.textDim, fontSize: 12 }}>{h.monto}</span>
                 </div>
-                <span className="font-body flex-1" style={{ color: C.text, fontSize: 12.5, fontWeight: 500 }}>{h.tipo}</span>
-                <span className="font-mono" style={{ color: h.monto[0] === "+" ? C.green : C.textDim, fontSize: 12 }}>{h.monto}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       );
@@ -577,9 +838,9 @@
     ========================================================= */
     function ScreenPerfil() {
       const menu = [
-        { icon: Fingerprint, label: "Seguridad y seed" },
-        { icon: Megaphone, label: "Suscripción — Plan Pro" },
-        { icon: Settings, label: "Configuración" },
+        { icon: Icon.Fingerprint, label: "Seguridad y seed" },
+        { icon: Icon.Megaphone, label: "Suscripción — Plan Pro" },
+        { icon: Icon.Settings, label: "Configuración" },
       ];
       return (
         <div className="px-5 pb-6">
@@ -596,7 +857,7 @@
             </CustodyRing>
             <div className="flex items-center gap-1.5 mt-3">
               <h2 className="font-display" style={{ color: C.text, fontSize: 16, fontWeight: 700 }}>Ody_Pro</h2>
-              <ShieldCheck size={14} color={C.green} />
+              <Icon.ShieldCheck size={14} color={C.green} />
             </div>
             <p className="font-body" style={{ color: C.textFaint, fontSize: 11 }}>Miembro desde 2023 · Nombre real oculto</p>
 
@@ -616,28 +877,37 @@
           </div>
 
           <div className="rounded-2xl overflow-hidden mb-4" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            {menu.map((m, i) => (
-              <button
-                key={m.label}
-                className="w-full flex items-center gap-3 px-4 py-3.5"
-                style={{ borderBottom: i < menu.length - 1 ? `1px solid ${C.borderSoft}` : "none", cursor: 'pointer', background: 'none', border: 'none' }}
-              >
-                <m.icon size={16} color={C.textDim} />
-                <span className="font-body flex-1 text-left" style={{ color: C.text, fontSize: 13 }}>{m.label}</span>
-                <ChevronRight size={15} color={C.textFaint} />
-              </button>
-            ))}
+            {menu.map((m, i) => {
+              const MenuIcon = m.icon;
+              return (
+                <button
+                  key={m.label}
+                  className="w-full flex items-center gap-3 px-4 py-3.5"
+                  style={{ 
+                    borderBottom: i < menu.length - 1 ? `1px solid ${C.borderSoft}` : "none", 
+                    cursor: 'pointer', 
+                    background: 'none',
+                    border: 'none',
+                    borderBottom: i < menu.length - 1 ? `1px solid ${C.borderSoft}` : "none"
+                  }}
+                >
+                  <MenuIcon size={16} color={C.textDim} />
+                  <span className="font-body flex-1 text-left" style={{ color: C.text, fontSize: 13 }}>{m.label}</span>
+                  <Icon.ChevronRight size={15} color={C.textFaint} />
+                </button>
+              );
+            })}
           </div>
 
           <div className="rounded-2xl p-3.5 mb-4 flex items-start gap-2.5" style={{ background: C.blueSoft, border: `1px solid ${C.blue}33` }}>
-            <ShieldCheck size={16} color={C.blue} style={{ marginTop: 1 }} />
+            <Icon.ShieldCheck size={16} color={C.blue} style={{ marginTop: 1 }} />
             <p className="font-body" style={{ color: C.textDim, fontSize: 11, lineHeight: 1.5 }}>
               Contrato verificado en BscScan · BNB Smart Chain · v1.2.0
             </p>
           </div>
 
           <button className="w-full flex items-center justify-center gap-2 rounded-xl py-3" style={{ background: C.redSoft, border: `1px solid ${C.red}44`, cursor: 'pointer' }}>
-            <LogOut size={14} color={C.red} />
+            <Icon.LogOut size={14} color={C.red} />
             <span className="font-display" style={{ color: C.red, fontSize: 12.5, fontWeight: 600 }}>Cerrar sesión</span>
           </button>
         </div>
@@ -649,11 +919,11 @@
     ========================================================= */
     function BottomNav({ active, goTo }) {
       const items = [
-        { id: "inicio", label: "Inicio", icon: Home },
-        { id: "mercado", label: "Mercado", icon: Store },
-        { id: "operacion", label: "Operación", icon: RefreshCw },
-        { id: "billetera", label: "Billetera", icon: WalletIcon },
-        { id: "perfil", label: "Perfil", icon: User },
+        { id: "inicio", label: "Inicio", icon: Icon.Home },
+        { id: "mercado", label: "Mercado", icon: Icon.Store },
+        { id: "operacion", label: "Operación", icon: Icon.RefreshCw },
+        { id: "billetera", label: "Billetera", icon: Icon.Wallet },
+        { id: "perfil", label: "Perfil", icon: Icon.User },
       ];
       return (
         <div
@@ -662,9 +932,15 @@
         >
           {items.map((it) => {
             const isActive = active === it.id;
+            const NavIcon = it.icon;
             return (
-              <button key={it.id} onClick={() => goTo(it.id)} className="flex flex-col items-center gap-1" style={{ width: 56, cursor: 'pointer', background: 'none', border: 'none' }}>
-                <it.icon size={18} color={isActive ? C.blue : C.textFaint} strokeWidth={isActive ? 2.4 : 2} />
+              <button 
+                key={it.id} 
+                onClick={() => goTo(it.id)} 
+                className="flex flex-col items-center gap-1" 
+                style={{ width: 56, cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                <NavIcon size={18} color={isActive ? C.blue : C.textFaint} strokeWidth={isActive ? 2.4 : 2} />
                 <span className="font-body" style={{ fontSize: 9.5, color: isActive ? C.blue : C.textFaint, fontWeight: isActive ? 600 : 400 }}>
                   {it.label}
                 </span>
@@ -699,8 +975,12 @@
             <div
               className="relative"
               style={{
-                width: 390, height: 844, borderRadius: 46, background: C.bg,
-                border: "10px solid #000", boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
+                width: 390, 
+                height: 844, 
+                borderRadius: 46, 
+                background: C.bg,
+                border: "10px solid #000", 
+                boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
                 overflow: "hidden",
               }}
             >
@@ -715,7 +995,7 @@
               <div className="relative flex flex-col h-full" style={{ zIndex: 10 }}>
                 <StatusBar />
                 <BrandHeader />
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                   {screens[screen]}
                 </div>
                 <BottomNav active={screen} goTo={setScreen} />
@@ -731,7 +1011,8 @@
     }
 
     // Renderizar la aplicación
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
   </script>
 </body>
 </html>
