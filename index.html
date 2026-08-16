@@ -5,15 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cosmo Link - Link P2P</title>
   
-  <!-- React y ReactDOM desde CDN -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  
-  <!-- Babel para JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    :root {
+      --bg: #0A0D12;
+      --surface: #12161F;
+      --surface2: #171C26;
+      --border: #232A36;
+      --borderSoft: #1A2029;
+      --red: #E5484D;
+      --redSoft: #3A1B1D;
+      --blue: #3B82F6;
+      --blueSoft: #152540;
+      --green: #22C55E;
+      --greenSoft: #12291B;
+      --amber: #E5A93B;
+      --text: #F3F5F8;
+      --textDim: #8D96A5;
+      --textFaint: #565F6D;
+    }
     
     * {
       margin: 0;
@@ -23,22 +34,220 @@
     
     body {
       background: #05070A;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
     }
     
-    .font-display {
-      font-family: 'Space Grotesk', sans-serif;
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Contenedor principal */
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     
-    .font-body {
-      font-family: 'Inter', sans-serif;
+    /* Marco del teléfono */
+    .phone-frame {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      border: 10px solid #000;
+      border-radius: 46px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      overflow: hidden;
     }
     
-    .font-mono {
+    /* Grid de fondo */
+    .grid-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        linear-gradient(var(--borderSoft) 1px, transparent 1px),
+        linear-gradient(90deg, var(--borderSoft) 1px, transparent 1px);
+      background-size: 22px 22px;
+      opacity: 0.35;
+      mask-image: radial-gradient(ellipse 100% 60% at 50% 0%, black 40%, transparent 90%);
+      -webkit-mask-image: radial-gradient(ellipse 100% 60% at 50% 0%, black 40%, transparent 90%);
+    }
+    
+    /* Notch */
+    .notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 26px;
+      background: #000;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      z-index: 20;
+    }
+    
+    /* Contenido del teléfono */
+    .phone-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    /* Barra de estado */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px 4px;
       font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+      font-size: 12px;
     }
     
-    /* Utilidades de flexbox */
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* Encabezado de marca */
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 20px 12px;
+    }
+    
+    .brand-logo {
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(135deg, var(--blue), var(--red));
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+    
+    .brand-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      color: var(--text);
+      font-weight: 600;
+    }
+    
+    .brand-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--textFaint);
+    }
+    
+    /* Área de contenido scrolleable */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px 24px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    .screen-content::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Barra de navegación inferior */
+    .bottom-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 8px 8px 22px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 56px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .nav-item span {
+      font-size: 9.5px;
+      color: var(--textFaint);
+      font-weight: 400;
+    }
+    
+    .nav-item.active span {
+      color: var(--blue);
+      font-weight: 600;
+    }
+    
+    /* Iconos SVG */
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    
+    .nav-item .icon {
+      width: 18px;
+      height: 18px;
+    }
+    
+    /* Componentes comunes */
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 9999px;
+      padding: 2px 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+    
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+    }
+    
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+    }
+    
     .flex { display: flex; }
     .flex-col { flex-direction: column; }
     .items-center { align-items: center; }
@@ -46,284 +255,145 @@
     .items-baseline { align-items: baseline; }
     .justify-center { justify-content: center; }
     .justify-between { justify-content: space-between; }
-    .justify-around { justify-content: space-around; }
     .flex-1 { flex: 1; }
     .gap-1 { gap: 4px; }
-    .gap-1\.5 { gap: 6px; }
+    .gap-1-5 { gap: 6px; }
     .gap-2 { gap: 8px; }
-    .gap-2\.5 { gap: 10px; }
     .gap-3 { gap: 12px; }
     .gap-4 { gap: 16px; }
     .gap-5 { gap: 20px; }
     
-    /* Utilidades de grid */
     .grid { display: grid; }
     .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
     
-    /* Utilidades de spacing */
-    .px-2 { padding-left: 8px; padding-right: 8px; }
-    .px-3 { padding-left: 12px; padding-right: 12px; }
-    .px-3\.5 { padding-left: 14px; padding-right: 14px; }
-    .px-4 { padding-left: 16px; padding-right: 16px; }
-    .px-5 { padding-left: 20px; padding-right: 20px; }
-    .px-6 { padding-left: 24px; padding-right: 24px; }
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
     
-    .py-0\.5 { padding-top: 2px; padding-bottom: 2px; }
-    .py-1 { padding-top: 4px; padding-bottom: 4px; }
-    .py-1\.5 { padding-top: 6px; padding-bottom: 6px; }
-    .py-2 { padding-top: 8px; padding-bottom: 8px; }
-    .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
-    .py-3 { padding-top: 12px; padding-bottom: 12px; }
-    .py-3\.5 { padding-top: 14px; padding-bottom: 14px; }
-    .py-10 { padding-top: 40px; padding-bottom: 40px; }
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .overflow-hidden { overflow: hidden; }
     
-    .pt-1 { padding-top: 4px; }
-    .pt-2 { padding-top: 8px; }
-    .pt-3 { padding-top: 12px; }
-    .pt-4 { padding-top: 16px; }
+    .rounded-lg { border-radius: 8px; }
+    .rounded-xl { border-radius: 12px; }
+    .rounded-2xl { border-radius: 20px; }
+    .rounded-full { border-radius: 50%; }
     
-    .pb-1 { padding-bottom: 4px; }
-    .pb-3 { padding-bottom: 12px; }
-    .pb-6 { padding-bottom: 24px; }
+    .w-full { width: 100%; }
+    .h-full { height: 100%; }
     
     .mt-1 { margin-top: 4px; }
     .mt-2 { margin-top: 8px; }
     .mt-3 { margin-top: 12px; }
     .mt-4 { margin-top: 16px; }
     .mt-5 { margin-top: 20px; }
-    
     .mb-2 { margin-bottom: 8px; }
     .mb-3 { margin-bottom: 12px; }
     .mb-4 { margin-bottom: 16px; }
     .mb-5 { margin-bottom: 20px; }
     
-    /* Utilidades de texto */
-    .text-center { text-align: center; }
-    .text-left { text-align: left; }
-    .text-right { text-align: right; }
+    .caption {
+      position: relative;
+      z-index: 30;
+      color: #4A5262;
+      font-size: 12px;
+      text-align: center;
+      max-width: 340px;
+      margin-top: 20px;
+    }
     
-    /* Utilidades de posición */
-    .relative { position: relative; }
-    .absolute { position: absolute; }
-    .overflow-hidden { overflow: hidden; }
-    .overflow-x-auto { overflow-x: auto; }
-    .overflow-y-auto { overflow-y: auto; }
-    .shrink-0 { flex-shrink: 0; }
+    /* Anillo de custodia */
+    .custody-ring {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
     
-    /* Utilidades de forma */
-    .rounded-lg { border-radius: 8px; }
-    .rounded-xl { border-radius: 12px; }
-    .rounded-2xl { border-radius: 20px; }
-    .rounded-full { border-radius: 50%; }
-    .rounded-md { border-radius: 6px; }
+    .custody-ring svg {
+      transform: rotate(-90deg);
+    }
     
-    /* Utilidades de tamaño */
-    .w-full { width: 100%; }
-    .min-h-screen { min-height: 100vh; }
-    .h-full { height: 100%; }
-    
-    /* Estilos para iconos SVG */
-    .icon {
-      display: inline-block;
-      vertical-align: middle;
-      flex-shrink: 0;
+    .custody-ring-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  
-  <script type="text/babel">
-    const { useState, Fragment, createElement } = React;
+  <div class="container">
+    <div class="phone-frame">
+      <div class="grid-backdrop"></div>
+      <div class="notch"></div>
+      <div class="phone-content">
+        <div class="status-bar">
+          <span>9:41</span>
+          <div class="status-icons">
+            <!-- Iconos de señal, wifi y batería -->
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
+          </div>
+        </div>
+        
+        <div class="brand-header">
+          <div class="brand-logo">C</div>
+          <span class="brand-name">Cosmo Link</span>
+          <span class="brand-tag">· Link P2P</span>
+        </div>
+        
+        <div class="screen-content" id="screen-content">
+          <!-- El contenido se renderiza aquí dinámicamente -->
+        </div>
+        
+        <div class="bottom-nav" id="bottom-nav">
+          <!-- La navegación se renderiza aquí dinámicamente -->
+        </div>
+      </div>
+    </div>
     
-    /* =========================================================
-       ICONOS SVG INLINE
-    ========================================================= */
-    const Icon = {
-      Home: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-      ),
-      Store: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M3 9l1.5-5h15L21 9"/>
-          <path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/>
-          <path d="M3 9h18"/>
-          <path d="M9 20v-6h6v6"/>
-        </svg>
-      ),
-      RefreshCw: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <polyline points="23 4 23 10 17 10"/>
-          <polyline points="1 20 1 14 7 14"/>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-        </svg>
-      ),
-      Wallet: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
-          <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
-          <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
-        </svg>
-      ),
-      User: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      ),
-      Bell: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
-          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
-        </svg>
-      ),
-      ShieldCheck: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          <polyline points="9 12 11 14 15 10"/>
-        </svg>
-      ),
-      ShieldAlert: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-      ),
-      ArrowUpRight: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <line x1="7" y1="17" x2="17" y2="7"/>
-          <polyline points="7 7 17 7 17 17"/>
-        </svg>
-      ),
-      ArrowDownRight: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <line x1="7" y1="7" x2="17" y2="17"/>
-          <polyline points="17 7 17 17 7 17"/>
-        </svg>
-      ),
-      ChevronRight: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      ),
-      MessageCircle: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-        </svg>
-      ),
-      Copy: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-        </svg>
-      ),
-      CheckCircle2: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <circle cx="12" cy="12" r="10"/>
-          <path d="m9 12 2 2 4-4"/>
-        </svg>
-      ),
-      Clock: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
-        </svg>
-      ),
-      Filter: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-        </svg>
-      ),
-      Lock: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-        </svg>
-      ),
-      Unlock: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
-        </svg>
-      ),
-      Megaphone: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="m3 11 18-5v12L3 14v-3z"/>
-          <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
-        </svg>
-      ),
-      Fingerprint: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
-          <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
-          <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
-          <path d="M2 12a10 10 0 0 1 18-6"/>
-          <path d="M2 16h.01"/>
-          <path d="M21.8 16c.2-2 .131-5.354 0-6"/>
-          <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/>
-          <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
-          <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
-        </svg>
-      ),
-      Settings: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <line x1="4" y1="21" x2="4" y2="14"/>
-          <line x1="4" y1="10" x2="4" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="12"/>
-          <line x1="12" y1="8" x2="12" y2="3"/>
-          <line x1="20" y1="21" x2="20" y2="16"/>
-          <line x1="20" y1="12" x2="20" y2="3"/>
-          <line x1="1" y1="14" x2="7" y2="14"/>
-          <line x1="9" y1="8" x2="15" y2="8"/>
-          <line x1="17" y1="16" x2="23" y2="16"/>
-        </svg>
-      ),
-      LogOut: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-      ),
-      Wifi: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
-          <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
-          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-          <line x1="12" y1="20" x2="12.01" y2="20"/>
-        </svg>
-      ),
-      Signal: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <path d="M2 20h.01"/>
-          <path d="M7 20v-4"/>
-          <path d="M12 20v-8"/>
-          <path d="M17 20V8"/>
-          <path d="M22 4v16"/>
-        </svg>
-      ),
-      BatteryFull: ({ size = 24, color = 'currentColor', strokeWidth = 2, style }) => (
-        <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-          <rect x="1" y="6" width="18" height="12" rx="2" ry="2"/>
-          <line x1="23" y1="13" x2="23" y2="11"/>
-          <line x1="3" y1="10" x2="3" y2="14"/>
-          <line x1="6" y1="10" x2="6" y2="14"/>
-          <line x1="9" y1="10" x2="9" y2="14"/>
-          <line x1="12" y1="10" x2="12" y2="14"/>
-        </svg>
-      ),
-    };
+    <p class="caption">
+      Maqueta interactiva · Toca los íconos inferiores o los accesos de Inicio para navegar entre pantallas
+    </p>
+  </div>
 
-    /* ---------------------------------------------------------------
-       TOKENS — Cosmo Link / Link P2P
-    ------------------------------------------------------------------*/
+  <script>
+    // ============================================================
+    // ICONOS SVG
+    // ============================================================
+    const icons = {
+      home: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+      store: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M3 9h18"/><path d="M9 20v-6h6v6"/></svg>',
+      refresh: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+      wallet: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>',
+      user: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+      bell: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+      shieldCheck: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>',
+      shieldAlert: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+      arrowUpRight: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>',
+      arrowDownRight: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="7" x2="17" y2="17"/><polyline points="17 7 17 17 7 17"/></svg>',
+      chevronRight: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+      messageCircle: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+      copy: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+      checkCircle: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+      clock: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      filter: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
+      lock: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+      unlock: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+      megaphone: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
+      fingerprint: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>',
+      settings: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>',
+      logOut: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+    };
+    
+    // ============================================================
+    // UTILIDADES
+    // ============================================================
     const C = {
       bg: "#0A0D12",
-      bgGrid: "#0D1117",
       surface: "#12161F",
       surface2: "#171C26",
       border: "#232A36",
@@ -339,680 +409,458 @@
       textDim: "#8D96A5",
       textFaint: "#565F6D",
     };
-
-    /* ---------------- Anillo de custodia ---------------- */
-    function CustodyRing({ pct = 70, size = 64, stroke = 6, color = C.blue, track = C.borderSoft, children }) {
+    
+    function custodyRing(pct, size, stroke, color, track, content) {
       const r = (size - stroke) / 2;
       const c = 2 * Math.PI * r;
       const offset = c - (pct / 100) * c;
-      return (
-        <div style={{ width: size, height: size, position: "relative" }}>
-          <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-            <circle cx={size / 2} cy={size / 2} r={r} stroke={track} strokeWidth={stroke} fill="none" />
-            <circle
-              cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none"
-              strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round"
-              style={{ transition: "stroke-dashoffset 0.6s ease" }}
-            />
+      return `
+        <div class="custody-ring" style="width:${size}px;height:${size}px;">
+          <svg width="${size}" height="${size}">
+            <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${track}" stroke-width="${stroke}" fill="none"/>
+            <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${stroke}" fill="none"
+              stroke-dasharray="${c}" stroke-dashoffset="${offset}" stroke-linecap="round"
+              style="transition: stroke-dashoffset 0.6s ease"/>
           </svg>
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {children}
-          </div>
+          <div class="custody-ring-content">${content}</div>
         </div>
-      );
+      `;
     }
-
-    /* ---------------- Fondo blueprint ---------------- */
-    function GridBackdrop() {
-      return (
-        <div
-          style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            backgroundImage: `linear-gradient(${C.borderSoft} 1px, transparent 1px), linear-gradient(90deg, ${C.borderSoft} 1px, transparent 1px)`,
-            backgroundSize: "22px 22px",
-            opacity: 0.35,
-            maskImage: "radial-gradient(ellipse 100% 60% at 50% 0%, black 40%, transparent 90%)",
-            WebkitMaskImage: "radial-gradient(ellipse 100% 60% at 50% 0%, black 40%, transparent 90%)",
-          }}
-        />
-      );
-    }
-
-    /* ---------------- Barra de estado ---------------- */
-    function StatusBar() {
-      return (
-        <div className="flex items-center justify-between px-6 pt-3 pb-1 font-mono" style={{ color: C.text, fontSize: 12 }}>
-          <span>9:41</span>
-          <div className="flex items-center gap-1">
-            <Icon.Signal size={13} color={C.text} />
-            <Icon.Wifi size={13} color={C.text} />
-            <Icon.BatteryFull size={14} color={C.text} />
-          </div>
-        </div>
-      );
-    }
-
-    /* ---------------- Encabezado de marca ---------------- */
-    function BrandHeader() {
-      return (
-        <div className="flex items-center gap-2 px-5 pt-1 pb-3">
-          <div
-            className="flex items-center justify-center rounded-md"
-            style={{ width: 22, height: 22, background: `linear-gradient(135deg, ${C.blue}, ${C.red})` }}
-          >
-            <span className="font-display" style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>C</span>
-          </div>
-          <span className="font-display" style={{ fontSize: 13, letterSpacing: 0.5, color: C.text, fontWeight: 600 }}>
-            Cosmo Link
-          </span>
-          <span className="font-mono" style={{ fontSize: 10, color: C.textFaint, marginLeft: 2 }}>· Link P2P</span>
-        </div>
-      );
-    }
-
-    /* ---------------- Chip de estado ---------------- */
-    function StatusChip({ label, tone = "blue" }) {
+    
+    function statusChip(label, tone) {
       const map = {
         blue: { bg: C.blueSoft, fg: C.blue },
         red: { bg: C.redSoft, fg: C.red },
         green: { bg: C.greenSoft, fg: C.green },
         amber: { bg: "#2E250F", fg: C.amber },
         gray: { bg: C.surface2, fg: C.textDim },
-      }[tone];
-      return (
-        <span
-          className="font-body inline-flex items-center rounded-full px-2 py-0.5"
-          style={{ background: map.bg, color: map.fg, fontSize: 10.5, fontWeight: 600, letterSpacing: 0.3 }}
-        >
-          {label}
-        </span>
-      );
+      };
+      const t = map[tone] || map.gray;
+      return `<span class="status-chip" style="background:${t.bg};color:${t.fg}">${label}</span>`;
     }
-
-    /* =========================================================
-       PANTALLA: INICIO
-    ========================================================= */
-    function ScreenInicio({ goTo }) {
+    
+    // ============================================================
+    // PANTALLAS
+    // ============================================================
+    function screenInicio() {
       const actividad = [
-        { nick: "MayelinCUP", tipo: "Compra", monto: "250.00 USDT", estado: "Liberado", tono: "green", icon: Icon.ArrowDownRight },
-        { nick: "Ody_Pro", tipo: "Venta", monto: "120.00 USDT", estado: "En curso", tono: "blue", icon: Icon.Clock },
-        { nick: "Havana_Trade", tipo: "Venta", monto: "80.00 USDT", estado: "Cancelada", tono: "red", icon: Icon.ArrowUpRight },
+        { nick: "MayelinCUP", tipo: "Compra", monto: "250.00 USDT", estado: "Liberado", tono: "green", icon: 'arrowDownRight' },
+        { nick: "Ody_Pro", tipo: "Venta", monto: "120.00 USDT", estado: "En curso", tono: "blue", icon: 'clock' },
+        { nick: "Havana_Trade", tipo: "Venta", monto: "80.00 USDT", estado: "Cancelada", tono: "red", icon: 'arrowUpRight' },
       ];
-      return (
-        <div className="px-5 pb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="font-body" style={{ color: C.textDim, fontSize: 12 }}>Bienvenido de nuevo</p>
-              <div className="flex items-center gap-1.5">
-                <h1 className="font-display" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Ody_Pro</h1>
-                <Icon.ShieldCheck size={15} color={C.green} />
+      
+      let actividadHTML = '';
+      actividad.forEach(a => {
+        actividadHTML += `
+          <button class="card rounded-xl flex items-center gap-3 mb-2" style="width:100%;padding:12px;cursor:pointer;border:1px solid ${C.border};background:${C.surface}" onclick="navigate('operacion')">
+            <div class="flex items-center justify-center rounded-full" style="width:34px;height:34px;background:${C.bg};border:1px solid ${C.borderSoft}">
+              <span style="color:${C.textDim}">${icons[a.icon]}</span>
+            </div>
+            <div class="flex-1 text-left">
+              <p style="color:${C.text};font-size:12.5px;font-weight:600">${a.tipo} · ${a.nick}</p>
+              <p style="color:${C.textDim};font-size:11px;font-family:'JetBrains Mono',monospace">${a.monto}</p>
+            </div>
+            ${statusChip(a.estado, a.tono)}
+          </button>
+        `;
+      });
+      
+      return `
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <p style="color:${C.textDim};font-size:12px">Bienvenido de nuevo</p>
+            <div class="flex items-center gap-1-5">
+              <h1 class="font-display" style="color:${C.text};font-size:19px;font-weight:600">Ody_Pro</h1>
+              <span style="color:${C.green}">${icons.shieldCheck}</span>
+            </div>
+          </div>
+          <button class="flex items-center justify-center rounded-full" style="width:36px;height:36px;background:${C.surface};border:1px solid ${C.border};cursor:pointer">
+            <span style="color:${C.textDim}">${icons.bell}</span>
+          </button>
+        </div>
+        
+        <div class="rounded-2xl relative overflow-hidden mb-4" style="background:linear-gradient(160deg, ${C.surface2} 0%, ${C.surface} 70%);border:1px solid ${C.border};padding:20px">
+          <div style="position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle, ${C.blue}22, transparent 70%)"></div>
+          <p style="color:${C.textDim};font-size:11.5px">Balance total</p>
+          <div class="flex items-baseline gap-2 mt-1">
+            <span class="font-display" style="color:${C.text};font-size:32px;font-weight:700">5,000.00</span>
+            <span style="color:${C.textDim};font-size:13px;font-family:'JetBrains Mono',monospace">USDT</span>
+          </div>
+          <div class="flex items-center gap-1-5 mt-1">
+            <span style="color:${C.amber};font-size:12px;font-family:'JetBrains Mono',monospace">0.084 BNB</span>
+            <span style="color:${C.textFaint};font-size:11px">· gas disponible</span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 mt-4">
+            <div class="rounded-xl" style="background:${C.bg};border:1px solid ${C.borderSoft};padding:8px 12px">
+              <div class="flex items-center gap-1">
+                <span style="color:${C.green}">${icons.unlock}</span>
+                <span style="color:${C.textDim};font-size:10.5px">Disponible</span>
               </div>
+              <span style="color:${C.text};font-size:14px;font-weight:600;font-family:'JetBrains Mono',monospace">4,000.00</span>
             </div>
-            <button
-              className="flex items-center justify-center rounded-full"
-              style={{ width: 36, height: 36, background: C.surface, border: `1px solid ${C.border}`, cursor: 'pointer' }}
-            >
-              <Icon.Bell size={16} color={C.textDim} />
-            </button>
-          </div>
-
-          {/* Tarjeta de balance */}
-          <div
-            className="rounded-2xl p-5 mb-4 relative overflow-hidden"
-            style={{ background: `linear-gradient(160deg, ${C.surface2} 0%, ${C.surface} 70%)`, border: `1px solid ${C.border}` }}
-          >
-            <div
-              style={{
-                position: "absolute", top: -40, right: -40, width: 140, height: 140, borderRadius: "50%",
-                background: `radial-gradient(circle, ${C.blue}22, transparent 70%)`,
-              }}
-            />
-            <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Balance total</p>
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className="font-display" style={{ color: C.text, fontSize: 32, fontWeight: 700 }}>5,000.00</span>
-              <span className="font-mono" style={{ color: C.textDim, fontSize: 13 }}>USDT</span>
-            </div>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className="font-mono" style={{ color: C.amber, fontSize: 12 }}>0.084 BNB</span>
-              <span className="font-body" style={{ color: C.textFaint, fontSize: 11 }}>· gas disponible</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              <div className="rounded-xl px-3 py-2" style={{ background: C.bg, border: `1px solid ${C.borderSoft}` }}>
-                <div className="flex items-center gap-1">
-                  <Icon.Unlock size={11} color={C.green} />
-                  <span className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>Disponible</span>
-                </div>
-                <span className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>4,000.00</span>
+            <div class="rounded-xl" style="background:${C.bg};border:1px solid ${C.borderSoft};padding:8px 12px">
+              <div class="flex items-center gap-1">
+                <span style="color:${C.red}">${icons.lock}</span>
+                <span style="color:${C.textDim};font-size:10.5px">Bloqueado</span>
               </div>
-              <div className="rounded-xl px-3 py-2" style={{ background: C.bg, border: `1px solid ${C.borderSoft}` }}>
-                <div className="flex items-center gap-1">
-                  <Icon.Lock size={11} color={C.red} />
-                  <span className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>Bloqueado</span>
-                </div>
-                <span className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>1,000.00</span>
-              </div>
+              <span style="color:${C.text};font-size:14px;font-weight:600;font-family:'JetBrains Mono',monospace">1,000.00</span>
             </div>
-          </div>
-
-          {/* Acciones rápidas */}
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            <button
-              onClick={() => goTo("mercado")}
-              className="rounded-xl py-3.5 flex flex-col items-start px-4"
-              style={{ background: C.blueSoft, border: `1px solid ${C.blue}55`, cursor: 'pointer' }}
-            >
-              <Icon.ArrowDownRight size={17} color={C.blue} />
-              <span className="font-display mt-2" style={{ color: C.text, fontSize: 13.5, fontWeight: 600 }}>Comprar USDT</span>
-            </button>
-            <button
-              onClick={() => goTo("mercado")}
-              className="rounded-xl py-3.5 flex flex-col items-start px-4"
-              style={{ background: C.redSoft, border: `1px solid ${C.red}55`, cursor: 'pointer' }}
-            >
-              <Icon.ArrowUpRight size={17} color={C.red} />
-              <span className="font-display mt-2" style={{ color: C.text, fontSize: 13.5, fontWeight: 600 }}>Vender USDT</span>
-            </button>
-          </div>
-
-          {/* Reputación */}
-          <div
-            className="rounded-2xl p-4 mb-5 flex items-center gap-4"
-            style={{ background: C.surface, border: `1px solid ${C.border}` }}
-          >
-            <CustodyRing pct={98} size={56} stroke={5} color={C.green}>
-              <span className="font-display" style={{ color: C.text, fontSize: 13, fontWeight: 700 }}>98%</span>
-            </CustodyRing>
-            <div className="flex-1">
-              <p className="font-body" style={{ color: C.text, fontSize: 13, fontWeight: 600 }}>Reputación de vendedor</p>
-              <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>214 operaciones · 3 años en Link P2P</p>
-            </div>
-            <Icon.ChevronRight size={16} color={C.textFaint} />
-          </div>
-
-          {/* Actividad reciente */}
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-display" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>Actividad reciente</h2>
-            <button onClick={() => goTo("operacion")} className="font-body" style={{ color: C.blue, fontSize: 11.5, cursor: 'pointer', background: 'none', border: 'none' }}>Ver todas</button>
-          </div>
-          <div className="flex flex-col gap-2">
-            {actividad.map((a, i) => {
-              const ActivityIcon = a.icon;
-              return (
-                <button
-                  key={i}
-                  onClick={() => goTo("operacion")}
-                  className="rounded-xl p-3 flex items-center gap-3"
-                  style={{ background: C.surface, border: `1px solid ${C.border}`, cursor: 'pointer' }}
-                >
-                  <div
-                    className="flex items-center justify-center rounded-full"
-                    style={{ width: 34, height: 34, background: C.bg, border: `1px solid ${C.borderSoft}` }}
-                  >
-                    <ActivityIcon size={15} color={C.textDim} />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-body" style={{ color: C.text, fontSize: 12.5, fontWeight: 600 }}>{a.tipo} · {a.nick}</p>
-                    <p className="font-mono" style={{ color: C.textDim, fontSize: 11 }}>{a.monto}</p>
-                  </div>
-                  <StatusChip label={a.estado} tone={a.tono} />
-                </button>
-              );
-            })}
           </div>
         </div>
-      );
+        
+        <div class="grid grid-cols-2 gap-3 mb-5">
+          <button onclick="navigate('mercado')" class="rounded-xl flex flex-col items-start" style="background:${C.blueSoft};border:1px solid ${C.blue}55;padding:14px 16px;cursor:pointer">
+            <span style="color:${C.blue}">${icons.arrowDownRight}</span>
+            <span class="font-display mt-2" style="color:${C.text};font-size:13.5px;font-weight:600">Comprar USDT</span>
+          </button>
+          <button onclick="navigate('mercado')" class="rounded-xl flex flex-col items-start" style="background:${C.redSoft};border:1px solid ${C.red}55;padding:14px 16px;cursor:pointer">
+            <span style="color:${C.red}">${icons.arrowUpRight}</span>
+            <span class="font-display mt-2" style="color:${C.text};font-size:13.5px;font-weight:600">Vender USDT</span>
+          </button>
+        </div>
+        
+        <div class="card rounded-2xl flex items-center gap-4 mb-5" style="padding:16px;border:1px solid ${C.border};background:${C.surface}">
+          ${custodyRing(98, 56, 5, C.green, C.borderSoft, '<span class="font-display" style="color:' + C.text + ';font-size:13px;font-weight:700">98%</span>')}
+          <div class="flex-1">
+            <p style="color:${C.text};font-size:13px;font-weight:600">Reputación de vendedor</p>
+            <p style="color:${C.textDim};font-size:11.5px">214 operaciones · 3 años en Link P2P</p>
+          </div>
+          <span style="color:${C.textFaint}">${icons.chevronRight}</span>
+        </div>
+        
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-display" style="color:${C.text};font-size:14px;font-weight:600">Actividad reciente</h2>
+          <button onclick="navigate('operacion')" style="color:${C.blue};font-size:11.5px;cursor:pointer;background:none;border:none">Ver todas</button>
+        </div>
+        <div class="flex flex-col gap-2">
+          ${actividadHTML}
+        </div>
+      `;
     }
-
-    /* =========================================================
-       PANTALLA: MERCADO
-    ========================================================= */
-    function ScreenMercado({ goTo }) {
-      const [modo, setModo] = useState("comprar");
+    
+    function screenMercado() {
       const anuncios = [
         { nick: "Havana_Trade", rating: 99, ops: 512, precio: "398", min: 100, max: 1500, metodo: "Transferencia bancaria", disp: 3200 },
         { nick: "CubaCambio21", rating: 96, ops: 87, precio: "400", min: 50, max: 800, metodo: "Transfermóvil", disp: 640 },
         { nick: "MayelinCUP", rating: 100, ops: 1204, precio: "401", min: 200, max: 5000, metodo: "Transferencia bancaria", disp: 8100 },
       ];
-      return (
-        <div className="px-5 pb-6">
-          <h1 className="font-display" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Mercado</h1>
-          <p className="font-body mb-4" style={{ color: C.textDim, fontSize: 12 }}>USDT ↔ CUP</p>
-
-          {/* Segmentado comprar/vender */}
-          <div className="flex rounded-xl p-1 mb-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            {["comprar", "vender"].map((m) => (
-              <button
-                key={m}
-                onClick={() => setModo(m)}
-                className="flex-1 rounded-lg py-2 font-display"
-                style={{
-                  fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
-                  background: modo === m ? (m === "comprar" ? C.blue : C.red) : "transparent",
-                  color: modo === m ? "#fff" : C.textDim,
-                  transition: "all .2s", border: 'none',
-                }}
-              >
-                {m === "comprar" ? "Comprar USDT" : "Vender USDT"}
+      
+      let anunciosHTML = '';
+      anuncios.forEach(a => {
+        anunciosHTML += `
+          <div class="rounded-2xl mb-3" style="background:${C.surface};border:1px solid ${C.border};padding:16px">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <div class="flex items-center justify-center rounded-full font-display" style="width:30px;height:30px;background:${C.surface2};color:${C.text};font-size:11.5px;font-weight:700">
+                  ${a.nick.slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <p style="color:${C.text};font-size:12.5px;font-weight:600">${a.nick}</p>
+                  <p style="color:${C.textFaint};font-size:10.5px">${a.rating}% · ${a.ops} operaciones</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p style="color:${C.blue};font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace">${a.precio}</p>
+                <p style="color:${C.textFaint};font-size:10px">CUP / USDT</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span style="color:${C.textDim};font-size:11px">Límite ${a.min} – ${a.max} USDT</span>
+              <span style="color:${C.textFaint};font-size:10.5px;font-family:'JetBrains Mono',monospace">${a.disp.toLocaleString()} disp.</span>
+            </div>
+            <div class="flex items-center justify-between">
+              ${statusChip(a.metodo, 'gray')}
+              <button onclick="navigate('operacion')" class="rounded-lg font-display" style="font-size:12px;font-weight:600;color:#fff;background:${C.blue};border:none;padding:6px 16px;cursor:pointer">
+                Comprar
               </button>
-            ))}
+            </div>
           </div>
-
-          {/* Filtros */}
-          <div className="flex items-center gap-2 mb-4 overflow-x-auto">
-            <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
-              <span className="font-body" style={{ color: C.text, fontSize: 11.5 }}>CUP</span>
-              <Icon.ChevronRight size={12} color={C.textFaint} style={{ transform: "rotate(90deg)" }} />
-            </button>
-            <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
-              <Icon.Filter size={11} color={C.textDim} />
-              <span className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Monto</span>
-            </button>
-            <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
-              <span className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Reputación</span>
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {anuncios.map((a, i) => (
-              <div key={i} className="rounded-2xl p-4" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="flex items-center justify-center rounded-full font-display"
-                      style={{ width: 30, height: 30, background: C.surface2, color: C.text, fontSize: 11.5, fontWeight: 700 }}
-                    >
-                      {a.nick.slice(0, 2).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-body" style={{ color: C.text, fontSize: 12.5, fontWeight: 600 }}>{a.nick}</p>
-                      <p className="font-body" style={{ color: C.textFaint, fontSize: 10.5 }}>{a.rating}% · {a.ops} operaciones</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-mono" style={{ color: modo === "comprar" ? C.blue : C.red, fontSize: 15, fontWeight: 700 }}>{a.precio}</p>
-                    <p className="font-body" style={{ color: C.textFaint, fontSize: 10 }}>CUP / USDT</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-body" style={{ color: C.textDim, fontSize: 11 }}>Límite {a.min} – {a.max} USDT</span>
-                  <span className="font-mono" style={{ color: C.textFaint, fontSize: 10.5 }}>{a.disp.toLocaleString()} disp.</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <StatusChip label={a.metodo} tone="gray" />
-                  <button
-                    onClick={() => goTo("operacion")}
-                    className="rounded-lg px-4 py-1.5 font-display"
-                    style={{
-                      fontSize: 12, fontWeight: 600, color: "#fff", cursor: 'pointer',
-                      background: modo === "comprar" ? C.blue : C.red, border: 'none',
-                    }}
-                  >
-                    {modo === "comprar" ? "Comprar" : "Vender"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        `;
+      });
+      
+      return `
+        <h1 class="font-display" style="color:${C.text};font-size:19px;font-weight:600">Mercado</h1>
+        <p class="mb-4" style="color:${C.textDim};font-size:12px">USDT ↔ CUP</p>
+        
+        <div class="flex rounded-xl mb-3" style="background:${C.surface};border:1px solid ${C.border};padding:4px">
+          <button class="flex-1 rounded-lg font-display" style="font-size:12.5px;font-weight:600;background:${C.blue};color:#fff;border:none;padding:8px;cursor:pointer">Comprar USDT</button>
+          <button class="flex-1 rounded-lg font-display" style="font-size:12.5px;font-weight:600;background:transparent;color:${C.textDim};border:none;padding:8px;cursor:pointer">Vender USDT</button>
         </div>
-      );
-    }
-
-    /* =========================================================
-       PANTALLA: OPERACIÓN
-    ========================================================= */
-    function ScreenOperacion() {
-      const pasos = ["Creada", "Aceptada", "Pagado", "Liberado"];
-      const pasoActual = 1;
-      return (
-        <div className="px-5 pb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="font-display" style={{ color: C.text, fontSize: 17, fontWeight: 600 }}>Operación #A1F9</h1>
-            <StatusChip label="ACCEPTED" tone="blue" />
-          </div>
-
-          {/* Stepper */}
-          <div className="flex items-center mb-5">
-            {pasos.map((p, i) => (
-              <Fragment key={p}>
-                <div className="flex flex-col items-center" style={{ width: 54 }}>
-                  <div
-                    className="flex items-center justify-center rounded-full font-mono"
-                    style={{
-                      width: 22, height: 22, fontSize: 10,
-                      background: i <= pasoActual ? C.blue : C.surface2,
-                      color: i <= pasoActual ? "#fff" : C.textFaint,
-                      border: `1px solid ${i <= pasoActual ? C.blue : C.border}`,
-                    }}
-                  >
-                    {i < pasoActual ? <Icon.CheckCircle2 size={12} color="#fff" /> : i + 1}
-                  </div>
-                  <span className="font-body mt-1" style={{ fontSize: 9, color: i <= pasoActual ? C.textDim : C.textFaint, textAlign: "center" }}>{p}</span>
-                </div>
-                {i < pasos.length - 1 && (
-                  <div className="flex-1" style={{ height: 1, background: i < pasoActual ? C.blue : C.border, marginBottom: 14 }} />
-                )}
-              </Fragment>
-            ))}
-          </div>
-
-          {/* Anillo de tiempo restante */}
-          <div className="rounded-2xl p-5 mb-4 flex items-center gap-5" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            <CustodyRing pct={62} size={78} stroke={6} color={C.amber}>
-              <div className="text-center">
-                <p className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 700, lineHeight: 1 }}>18:32</p>
-                <p className="font-body" style={{ color: C.textFaint, fontSize: 8 }}>restantes</p>
-              </div>
-            </CustodyRing>
-            <div>
-              <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Escrow activo</p>
-              <p className="font-body" style={{ color: C.text, fontSize: 12.5, maxWidth: 160 }}>
-                Los USDT quedan bloqueados en el contrato hasta confirmar el pago.
-              </p>
-            </div>
-          </div>
-
-          {/* Detalle */}
-          <div className="rounded-2xl p-4 mb-4" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            {[
-              ["Contraparte", "Havana_Trade"],
-              ["Nombre real", "Yoandry P. — visible solo aquí"],
-              ["Cantidad", "250.00 USDT"],
-              ["Precio", "398 CUP / USDT"],
-              ["Total a pagar", "99,500 CUP"],
-              ["Método de pago", "Transferencia bancaria"],
-            ].map(([label, val], i, arr) => (
-              <div
-                key={label}
-                className="flex items-center justify-between py-2.5"
-                style={{ borderBottom: i < arr.length - 1 ? `1px solid ${C.borderSoft}` : "none" }}
-              >
-                <span className="font-body" style={{ color: C.textDim, fontSize: 12 }}>{label}</span>
-                <span className="font-body" style={{ color: C.text, fontSize: 12, fontWeight: 600, textAlign: "right", maxWidth: 170 }}>{val}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Chat preview */}
-          <div className="rounded-2xl p-3.5 mb-5 flex items-center gap-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            <div className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: C.blueSoft }}>
-              <Icon.MessageCircle size={14} color={C.blue} />
-            </div>
-            <div className="flex-1">
-              <p className="font-body" style={{ color: C.text, fontSize: 12, fontWeight: 600 }}>Havana_Trade</p>
-              <p className="font-body" style={{ color: C.textDim, fontSize: 11 }}>"Envío el comprobante en 2 min…"</p>
-            </div>
-            <Icon.ChevronRight size={15} color={C.textFaint} />
-          </div>
-
-          <div className="flex gap-3">
-            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.text, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-              Abrir chat
-            </button>
-            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.blue, color: "#fff", fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none' }}>
-              He pagado
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    /* =========================================================
-       PANTALLA: BILLETERA
-    ========================================================= */
-    function ScreenBilletera() {
-      const historial = [
-        { tipo: "Depósito", monto: "+1,200.00 USDT", icon: Icon.ArrowDownRight, tono: "green" },
-        { tipo: "Bloqueo escrow", monto: "-250.00 USDT", icon: Icon.Lock, tono: "amber" },
-        { tipo: "Retiro", monto: "-400.00 USDT", icon: Icon.ArrowUpRight, tono: "red" },
-        { tipo: "Liberación escrow", monto: "+120.00 USDT", icon: Icon.Unlock, tono: "green" },
-      ];
-      return (
-        <div className="px-5 pb-6">
-          <h1 className="font-display mb-4" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Billetera</h1>
-
-          <div className="rounded-2xl p-5 mb-3" style={{ background: `linear-gradient(160deg, ${C.surface2}, ${C.surface})`, border: `1px solid ${C.border}` }}>
-            <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>USDT · BEP-20</p>
-            <div className="flex items-baseline gap-2">
-              <span className="font-display" style={{ color: C.text, fontSize: 28, fontWeight: 700 }}>5,000.00</span>
-              <span className="font-mono" style={{ color: C.textDim, fontSize: 12 }}>USDT</span>
-            </div>
-            <div className="flex items-center gap-2 mt-2 font-mono" style={{ fontSize: 10, color: C.textFaint }}>
-              <span>0xA3f1…9C2e</span>
-              <Icon.Copy size={11} color={C.textFaint} />
-            </div>
-          </div>
-
-          <div className="rounded-xl p-3.5 mb-4 flex items-center justify-between" style={{ background: C.redSoft, border: `1px solid ${C.red}44` }}>
-            <div className="flex items-center gap-2">
-              <Icon.ShieldAlert size={16} color={C.red} />
-              <div>
-                <p className="font-body" style={{ color: C.text, fontSize: 11.5, fontWeight: 600 }}>BNB para gas bajo</p>
-                <p className="font-mono" style={{ color: C.textDim, fontSize: 10 }}>0.004 BNB disponibles</p>
-              </div>
-            </div>
-            <button className="font-display" style={{ color: C.red, fontSize: 11, fontWeight: 700, cursor: 'pointer', background: 'none', border: 'none' }}>Añadir</button>
-          </div>
-
-          <div className="flex gap-3 mb-5">
-            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.blue, color: "#fff", fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none' }}>Depositar</button>
-            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.text, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Retirar</button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 mb-5">
-            {[
-              ["Disponible", "4,000.00", C.green],
-              ["Bloqueado", "1,000.00", C.red],
-              ["Anunciado", "3,200.00", C.blue],
-              ["Retirable", "4,000.00", C.text],
-            ].map(([label, val, col]) => (
-              <div key={label} className="rounded-xl p-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-                <p className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>{label}</p>
-                <p className="font-mono" style={{ color: col, fontSize: 13.5, fontWeight: 700 }}>{val}</p>
-              </div>
-            ))}
-          </div>
-
-          <h2 className="font-display mb-2" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>Historial</h2>
-          <div className="flex flex-col gap-2">
-            {historial.map((h, i) => {
-              const HistoryIcon = h.icon;
-              const iconColor = h.tono === "green" ? C.green : h.tono === "red" ? C.red : C.amber;
-              return (
-                <div key={i} className="rounded-xl p-3 flex items-center gap-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-                  <div className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: C.bg, border: `1px solid ${C.borderSoft}` }}>
-                    <HistoryIcon size={14} color={iconColor} />
-                  </div>
-                  <span className="font-body flex-1" style={{ color: C.text, fontSize: 12.5, fontWeight: 500 }}>{h.tipo}</span>
-                  <span className="font-mono" style={{ color: h.monto[0] === "+" ? C.green : C.textDim, fontSize: 12 }}>{h.monto}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    /* =========================================================
-       PANTALLA: PERFIL
-    ========================================================= */
-    function ScreenPerfil() {
-      const menu = [
-        { icon: Icon.Fingerprint, label: "Seguridad y seed" },
-        { icon: Icon.Megaphone, label: "Suscripción — Plan Pro" },
-        { icon: Icon.Settings, label: "Configuración" },
-      ];
-      return (
-        <div className="px-5 pb-6">
-          <h1 className="font-display mb-4" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Perfil</h1>
-
-          <div className="rounded-2xl p-5 mb-4 flex flex-col items-center" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            <CustodyRing pct={98} size={88} stroke={6} color={C.blue}>
-              <div
-                className="flex items-center justify-center rounded-full font-display"
-                style={{ width: 68, height: 68, background: C.surface2, color: C.text, fontSize: 20, fontWeight: 700 }}
-              >
-                OP
-              </div>
-            </CustodyRing>
-            <div className="flex items-center gap-1.5 mt-3">
-              <h2 className="font-display" style={{ color: C.text, fontSize: 16, fontWeight: 700 }}>Ody_Pro</h2>
-              <Icon.ShieldCheck size={14} color={C.green} />
-            </div>
-            <p className="font-body" style={{ color: C.textFaint, fontSize: 11 }}>Miembro desde 2023 · Nombre real oculto</p>
-
-            <div className="flex gap-2 mt-3">
-              <StatusChip label="KYC aprobado" tone="green" />
-              <StatusChip label="Plan Pro" tone="blue" />
-            </div>
-
-            <div className="flex w-full mt-4 pt-4" style={{ borderTop: `1px solid ${C.borderSoft}` }}>
-              {[["214", "Operaciones"], ["98%", "Aceptación"], ["3.9k", "Volumen USDT"]].map(([n, l]) => (
-                <div key={l} className="flex-1 text-center">
-                  <p className="font-display" style={{ color: C.text, fontSize: 15, fontWeight: 700 }}>{n}</p>
-                  <p className="font-body" style={{ color: C.textFaint, fontSize: 10 }}>{l}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden mb-4" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
-            {menu.map((m, i) => {
-              const MenuIcon = m.icon;
-              return (
-                <button
-                  key={m.label}
-                  className="w-full flex items-center gap-3 px-4 py-3.5"
-                  style={{ 
-                    borderBottom: i < menu.length - 1 ? `1px solid ${C.borderSoft}` : "none", 
-                    cursor: 'pointer', 
-                    background: 'none',
-                    border: 'none',
-                    borderBottom: i < menu.length - 1 ? `1px solid ${C.borderSoft}` : "none"
-                  }}
-                >
-                  <MenuIcon size={16} color={C.textDim} />
-                  <span className="font-body flex-1 text-left" style={{ color: C.text, fontSize: 13 }}>{m.label}</span>
-                  <Icon.ChevronRight size={15} color={C.textFaint} />
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="rounded-2xl p-3.5 mb-4 flex items-start gap-2.5" style={{ background: C.blueSoft, border: `1px solid ${C.blue}33` }}>
-            <Icon.ShieldCheck size={16} color={C.blue} style={{ marginTop: 1 }} />
-            <p className="font-body" style={{ color: C.textDim, fontSize: 11, lineHeight: 1.5 }}>
-              Contrato verificado en BscScan · BNB Smart Chain · v1.2.0
-            </p>
-          </div>
-
-          <button className="w-full flex items-center justify-center gap-2 rounded-xl py-3" style={{ background: C.redSoft, border: `1px solid ${C.red}44`, cursor: 'pointer' }}>
-            <Icon.LogOut size={14} color={C.red} />
-            <span className="font-display" style={{ color: C.red, fontSize: 12.5, fontWeight: 600 }}>Cerrar sesión</span>
+        
+        <div class="flex items-center gap-2 mb-4" style="overflow-x:auto">
+          <button class="flex items-center gap-1 rounded-full" style="background:${C.surface2};border:1px solid ${C.border};padding:6px 12px;cursor:pointer;white-space:nowrap">
+            <span style="color:${C.text};font-size:11.5px">CUP</span>
+            <span style="color:${C.textFaint};transform:rotate(90deg)">${icons.chevronRight}</span>
+          </button>
+          <button class="flex items-center gap-1 rounded-full" style="background:${C.surface2};border:1px solid ${C.border};padding:6px 12px;cursor:pointer;white-space:nowrap">
+            <span style="color:${C.textDim}">${icons.filter}</span>
+            <span style="color:${C.textDim};font-size:11.5px">Monto</span>
+          </button>
+          <button class="flex items-center gap-1 rounded-full" style="background:${C.surface2};border:1px solid ${C.border};padding:6px 12px;cursor:pointer;white-space:nowrap">
+            <span style="color:${C.textDim};font-size:11.5px">Reputación</span>
           </button>
         </div>
-      );
-    }
-
-    /* =========================================================
-       NAVEGACIÓN INFERIOR
-    ========================================================= */
-    function BottomNav({ active, goTo }) {
-      const items = [
-        { id: "inicio", label: "Inicio", icon: Icon.Home },
-        { id: "mercado", label: "Mercado", icon: Icon.Store },
-        { id: "operacion", label: "Operación", icon: Icon.RefreshCw },
-        { id: "billetera", label: "Billetera", icon: Icon.Wallet },
-        { id: "perfil", label: "Perfil", icon: Icon.User },
-      ];
-      return (
-        <div
-          className="flex items-center justify-around px-2 pt-2"
-          style={{ background: C.surface, borderTop: `1px solid ${C.border}`, paddingBottom: 22 }}
-        >
-          {items.map((it) => {
-            const isActive = active === it.id;
-            const NavIcon = it.icon;
-            return (
-              <button 
-                key={it.id} 
-                onClick={() => goTo(it.id)} 
-                className="flex flex-col items-center gap-1" 
-                style={{ width: 56, cursor: 'pointer', background: 'none', border: 'none' }}
-              >
-                <NavIcon size={18} color={isActive ? C.blue : C.textFaint} strokeWidth={isActive ? 2.4 : 2} />
-                <span className="font-body" style={{ fontSize: 9.5, color: isActive ? C.blue : C.textFaint, fontWeight: isActive ? 600 : 400 }}>
-                  {it.label}
-                </span>
-              </button>
-            );
-          })}
+        
+        <div class="flex flex-col gap-3">
+          ${anunciosHTML}
         </div>
-      );
+      `;
     }
-
-    /* =========================================================
-       APP RAÍZ
-    ========================================================= */
-    function App() {
-      const [screen, setScreen] = useState("inicio");
-
-      const screens = {
-        inicio: <ScreenInicio goTo={setScreen} />,
-        mercado: <ScreenMercado goTo={setScreen} />,
-        operacion: <ScreenOperacion />,
-        billetera: <ScreenBilletera />,
-        perfil: <ScreenPerfil />,
-      };
-
-      return (
-        <div
-          className="w-full min-h-screen flex items-center justify-center py-10"
-          style={{ background: "#05070A" }}
-        >
-          <div className="flex flex-col items-center">
-            {/* Marco del teléfono */}
-            <div
-              className="relative"
-              style={{
-                width: 390, 
-                height: 844, 
-                borderRadius: 46, 
-                background: C.bg,
-                border: "10px solid #000", 
-                boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
-                overflow: "hidden",
-              }}
-            >
-              <GridBackdrop />
-              {/* Notch */}
-              <div
-                style={{
-                  position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-                  width: 120, height: 26, background: "#000", borderBottomLeftRadius: 16, borderBottomRightRadius: 16, zIndex: 20,
-                }}
-              />
-              <div className="relative flex flex-col h-full" style={{ zIndex: 10 }}>
-                <StatusBar />
-                <BrandHeader />
-                <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                  {screens[screen]}
+    
+    function screenOperacion() {
+      return `
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="font-display" style="color:${C.text};font-size:17px;font-weight:600">Operación #A1F9</h1>
+          ${statusChip('ACCEPTED', 'blue')}
+        </div>
+        
+        <div class="flex items-center mb-5">
+          ${[0,1,2,3].map(i => {
+            const pasos = ["Creada", "Aceptada", "Pagado", "Liberado"];
+            const pasoActual = 1;
+            return `
+              <div class="flex flex-col items-center" style="width:54px">
+                <div class="flex items-center justify-center rounded-full" style="width:22px;height:22px;font-size:10px;font-family:'JetBrains Mono',monospace;background:${i <= pasoActual ? C.blue : C.surface2};color:${i <= pasoActual ? '#fff' : C.textFaint};border:1px solid ${i <= pasoActual ? C.blue : C.border}">
+                  ${i < pasoActual ? icons.checkCircle : (i + 1)}
                 </div>
-                <BottomNav active={screen} goTo={setScreen} />
+                <span style="font-size:9px;color:${i <= pasoActual ? C.textDim : C.textFaint};text-align:center;margin-top:4px">${pasos[i]}</span>
               </div>
-            </div>
-
-            <p className="font-body mt-5" style={{ color: "#4A5262", fontSize: 12, textAlign: "center", maxWidth: 340 }}>
-              Maqueta interactiva · Toca los íconos inferiores o los accesos de Inicio para navegar entre pantallas
-            </p>
+              ${i < 3 ? `<div class="flex-1" style="height:1px;background:${i < pasoActual ? C.blue : C.border};margin-bottom:14px"></div>` : ''}
+            `;
+          }).join('')}
+        </div>
+        
+        <div class="rounded-2xl flex items-center gap-5 mb-4" style="background:${C.surface};border:1px solid ${C.border};padding:20px">
+          ${custodyRing(62, 78, 6, C.amber, C.borderSoft, '<div class="text-center"><p style="color:' + C.text + ';font-size:14px;font-weight:700;line-height:1;font-family:\'JetBrains Mono\',monospace">18:32</p><p style="color:' + C.textFaint + ';font-size:8px">restantes</p></div>')}
+          <div>
+            <p style="color:${C.textDim};font-size:11.5px">Escrow activo</p>
+            <p style="color:${C.text};font-size:12.5px;max-width:160px">Los USDT quedan bloqueados en el contrato hasta confirmar el pago.</p>
           </div>
         </div>
-      );
+        
+        <div class="rounded-2xl mb-4" style="background:${C.surface};border:1px solid ${C.border};padding:16px">
+          ${[
+            ["Contraparte", "Havana_Trade"],
+            ["Nombre real", "Yoandry P. — visible solo aquí"],
+            ["Cantidad", "250.00 USDT"],
+            ["Precio", "398 CUP / USDT"],
+            ["Total a pagar", "99,500 CUP"],
+            ["Método de pago", "Transferencia bancaria"],
+          ].map((item, i, arr) => `
+            <div class="flex items-center justify-between" style="padding:10px 0;border-bottom:${i < arr.length - 1 ? `1px solid ${C.borderSoft}` : 'none'}">
+              <span style="color:${C.textDim};font-size:12px">${item[0]}</span>
+              <span style="color:${C.text};font-size:12px;font-weight:600;text-align:right;max-width:170px">${item[1]}</span>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="rounded-2xl flex items-center gap-3 mb-5" style="background:${C.surface};border:1px solid ${C.border};padding:14px">
+          <div class="flex items-center justify-center rounded-full" style="width:32px;height:32px;background:${C.blueSoft}">
+            <span style="color:${C.blue}">${icons.messageCircle}</span>
+          </div>
+          <div class="flex-1">
+            <p style="color:${C.text};font-size:12px;font-weight:600">Havana_Trade</p>
+            <p style="color:${C.textDim};font-size:11px">"Envío el comprobante en 2 min…"</p>
+          </div>
+          <span style="color:${C.textFaint}">${icons.chevronRight}</span>
+        </div>
+        
+        <div class="flex gap-3">
+          <button class="flex-1 rounded-xl font-display" style="background:${C.surface};border:1px solid ${C.border};color:${C.text};font-size:13px;font-weight:600;padding:12px;cursor:pointer">Abrir chat</button>
+          <button class="flex-1 rounded-xl font-display" style="background:${C.blue};color:#fff;font-size:13px;font-weight:600;padding:12px;cursor:pointer;border:none">He pagado</button>
+        </div>
+      `;
     }
-
-    // Renderizar la aplicación
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    
+    function screenBilletera() {
+      const historial = [
+        { tipo: "Depósito", monto: "+1,200.00 USDT", icon: 'arrowDownRight', tono: 'green' },
+        { tipo: "Bloqueo escrow", monto: "-250.00 USDT", icon: 'lock', tono: 'amber' },
+        { tipo: "Retiro", monto: "-400.00 USDT", icon: 'arrowUpRight', tono: 'red' },
+        { tipo: "Liberación escrow", monto: "+120.00 USDT", icon: 'unlock', tono: 'green' },
+      ];
+      
+      let historialHTML = '';
+      historial.forEach(h => {
+        const iconColor = h.tono === 'green' ? C.green : h.tono === 'red' ? C.red : C.amber;
+        historialHTML += `
+          <div class="rounded-xl flex items-center gap-3 mb-2" style="background:${C.surface};border:1px solid ${C.border};padding:12px">
+            <div class="flex items-center justify-center rounded-full" style="width:32px;height:32px;background:${C.bg};border:1px solid ${C.borderSoft}">
+              <span style="color:${iconColor}">${icons[h.icon]}</span>
+            </div>
+            <span class="flex-1" style="color:${C.text};font-size:12.5px;font-weight:500">${h.tipo}</span>
+            <span style="color:${h.monto[0] === '+' ? C.green : C.textDim};font-size:12px;font-family:'JetBrains Mono',monospace">${h.monto}</span>
+          </div>
+        `;
+      });
+      
+      return `
+        <h1 class="font-display mb-4" style="color:${C.text};font-size:19px;font-weight:600">Billetera</h1>
+        
+        <div class="rounded-2xl mb-3" style="background:linear-gradient(160deg, ${C.surface2}, ${C.surface});border:1px solid ${C.border};padding:20px">
+          <p style="color:${C.textDim};font-size:11.5px">USDT · BEP-20</p>
+          <div class="flex items-baseline gap-2">
+            <span class="font-display" style="color:${C.text};font-size:28px;font-weight:700">5,000.00</span>
+            <span style="color:${C.textDim};font-size:12px;font-family:'JetBrains Mono',monospace">USDT</span>
+          </div>
+          <div class="flex items-center gap-2 mt-2" style="font-size:10px;color:${C.textFaint};font-family:'JetBrains Mono',monospace">
+            <span>0xA3f1…9C2e</span>
+            <span>${icons.copy}</span>
+          </div>
+        </div>
+        
+        <div class="rounded-xl flex items-center justify-between mb-4" style="background:${C.redSoft};border:1px solid ${C.red}44;padding:14px">
+          <div class="flex items-center gap-2">
+            <span style="color:${C.red}">${icons.shieldAlert}</span>
+            <div>
+              <p style="color:${C.text};font-size:11.5px;font-weight:600">BNB para gas bajo</p>
+              <p style="color:${C.textDim};font-size:10px;font-family:'JetBrains Mono',monospace">0.004 BNB disponibles</p>
+            </div>
+          </div>
+          <button class="font-display" style="color:${C.red};font-size:11px;font-weight:700;background:none;border:none;cursor:pointer">Añadir</button>
+        </div>
+        
+        <div class="flex gap-3 mb-5">
+          <button class="flex-1 rounded-xl font-display" style="background:${C.blue};color:#fff;font-size:13px;font-weight:600;padding:12px;border:none;cursor:pointer">Depositar</button>
+          <button class="flex-1 rounded-xl font-display" style="background:${C.surface};border:1px solid ${C.border};color:${C.text};font-size:13px;font-weight:600;padding:12px;cursor:pointer">Retirar</button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-2 mb-5">
+          ${[
+            ["Disponible", "4,000.00", C.green],
+            ["Bloqueado", "1,000.00", C.red],
+            ["Anunciado", "3,200.00", C.blue],
+            ["Retirable", "4,000.00", C.text],
+          ].map(item => `
+            <div class="rounded-xl" style="background:${C.surface};border:1px solid ${C.border};padding:12px">
+              <p style="color:${C.textDim};font-size:10.5px">${item[0]}</p>
+              <p style="color:${item[2]};font-size:13.5px;font-weight:700;font-family:'JetBrains Mono',monospace">${item[1]}</p>
+            </div>
+          `).join('')}
+        </div>
+        
+        <h2 class="font-display mb-2" style="color:${C.text};font-size:14px;font-weight:600">Historial</h2>
+        <div class="flex flex-col gap-2">
+          ${historialHTML}
+        </div>
+      `;
+    }
+    
+    function screenPerfil() {
+      const menu = [
+        { icon: 'fingerprint', label: "Seguridad y seed" },
+        { icon: 'megaphone', label: "Suscripción — Plan Pro" },
+        { icon: 'settings', label: "Configuración" },
+      ];
+      
+      let menuHTML = '';
+      menu.forEach((m, i) => {
+        menuHTML += `
+          <button class="w-full flex items-center gap-3" style="padding:14px 16px;border-bottom:${i < menu.length - 1 ? `1px solid ${C.borderSoft}` : 'none'};cursor:pointer;background:none;border:none">
+            <span style="color:${C.textDim}">${icons[m.icon]}</span>
+            <span class="flex-1 text-left" style="color:${C.text};font-size:13px">${m.label}</span>
+            <span style="color:${C.textFaint}">${icons.chevronRight}</span>
+          </button>
+        `;
+      });
+      
+      return `
+        <h1 class="font-display mb-4" style="color:${C.text};font-size:19px;font-weight:600">Perfil</h1>
+        
+        <div class="rounded-2xl flex flex-col items-center mb-4" style="background:${C.surface};border:1px solid ${C.border};padding:20px">
+          ${custodyRing(98, 88, 6, C.blue, C.borderSoft, '<div class="flex items-center justify-center rounded-full font-display" style="width:68px;height:68px;background:' + C.surface2 + ';color:' + C.text + ';font-size:20px;font-weight:700">OP</div>')}
+          <div class="flex items-center gap-1-5 mt-3">
+            <h2 class="font-display" style="color:${C.text};font-size:16px;font-weight:700">Ody_Pro</h2>
+            <span style="color:${C.green}">${icons.shieldCheck}</span>
+          </div>
+          <p style="color:${C.textFaint};font-size:11px">Miembro desde 2023 · Nombre real oculto</p>
+          
+          <div class="flex gap-2 mt-3">
+            ${statusChip('KYC aprobado', 'green')}
+            ${statusChip('Plan Pro', 'blue')}
+          </div>
+          
+          <div class="flex w-full mt-4" style="border-top:1px solid ${C.borderSoft};padding-top:16px">
+            ${[["214", "Operaciones"], ["98%", "Aceptación"], ["3.9k", "Volumen USDT"]].map(item => `
+              <div class="flex-1 text-center">
+                <p class="font-display" style="color:${C.text};font-size:15px;font-weight:700">${item[0]}</p>
+                <p style="color:${C.textFaint};font-size:10px">${item[1]}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="rounded-2xl overflow-hidden mb-4" style="background:${C.surface};border:1px solid ${C.border}">
+          ${menuHTML}
+        </div>
+        
+        <div class="rounded-2xl flex items-start gap-2-5 mb-4" style="background:${C.blueSoft};border:1px solid ${C.blue}33;padding:14px">
+          <span style="color:${C.blue};margin-top:1px">${icons.shieldCheck}</span>
+          <p style="color:${C.textDim};font-size:11px;line-height:1.5">Contrato verificado en BscScan · BNB Smart Chain · v1.2.0</p>
+        </div>
+        
+        <button class="w-full flex items-center justify-center gap-2 rounded-xl" style="background:${C.redSoft};border:1px solid ${C.red}44;padding:12px;cursor:pointer">
+          <span style="color:${C.red}">${icons.logOut}</span>
+          <span class="font-display" style="color:${C.red};font-size:12.5px;font-weight:600">Cerrar sesión</span>
+        </button>
+      `;
+    }
+    
+    // ============================================================
+    // NAVEGACIÓN
+    // ============================================================
+    let currentScreen = 'inicio';
+    
+    const screens = {
+      inicio: screenInicio,
+      mercado: screenMercado,
+      operacion: screenOperacion,
+      billetera: screenBilletera,
+      perfil: screenPerfil,
+    };
+    
+    function navigate(screen) {
+      currentScreen = screen;
+      renderScreen();
+      renderNav();
+    }
+    
+    function renderScreen() {
+      const content = document.getElementById('screen-content');
+      content.innerHTML = screens[currentScreen]();
+    }
+    
+    function renderNav() {
+      const nav = document.getElementById('bottom-nav');
+      const items = [
+        { id: 'inicio', label: 'Inicio', icon: 'home' },
+        { id: 'mercado', label: 'Mercado', icon: 'store' },
+        { id: 'operacion', label: 'Operación', icon: 'refresh' },
+        { id: 'billetera', label: 'Billetera', icon: 'wallet' },
+        { id: 'perfil', label: 'Perfil', icon: 'user' },
+      ];
+      
+      let navHTML = '';
+      items.forEach(item => {
+        const isActive = currentScreen === item.id;
+        navHTML += `
+          <button class="nav-item ${isActive ? 'active' : ''}" onclick="navigate('${item.id}')">
+            <span style="color:${isActive ? C.blue : C.textFaint}">${icons[item.icon]}</span>
+            <span>${item.label}</span>
+          </button>
+        `;
+      });
+      
+      nav.innerHTML = navHTML;
+    }
+    
+    // Inicializar
+    renderScreen();
+    renderNav();
+    
+    // Exponer navigate globalmente
+    window.navigate = navigate;
   </script>
 </body>
-</html>
+  </html>
