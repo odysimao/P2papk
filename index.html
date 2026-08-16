@@ -605,4 +605,133 @@
               <StatusChip label="Plan Pro" tone="blue" />
             </div>
 
-            <div className="flex w-full mt-4 pt-4" style={{ borderTop: `1px solid ${C.borderSoft}`
+            <div className="flex w-full mt-4 pt-4" style={{ borderTop: `1px solid ${C.borderSoft}` }}>
+              {[["214", "Operaciones"], ["98%", "Aceptación"], ["3.9k", "Volumen USDT"]].map(([n, l]) => (
+                <div key={l} className="flex-1 text-center">
+                  <p className="font-display" style={{ color: C.text, fontSize: 15, fontWeight: 700 }}>{n}</p>
+                  <p className="font-body" style={{ color: C.textFaint, fontSize: 10 }}>{l}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl overflow-hidden mb-4" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            {menu.map((m, i) => (
+              <button
+                key={m.label}
+                className="w-full flex items-center gap-3 px-4 py-3.5"
+                style={{ borderBottom: i < menu.length - 1 ? `1px solid ${C.borderSoft}` : "none", cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                <m.icon size={16} color={C.textDim} />
+                <span className="font-body flex-1 text-left" style={{ color: C.text, fontSize: 13 }}>{m.label}</span>
+                <ChevronRight size={15} color={C.textFaint} />
+              </button>
+            ))}
+          </div>
+
+          <div className="rounded-2xl p-3.5 mb-4 flex items-start gap-2.5" style={{ background: C.blueSoft, border: `1px solid ${C.blue}33` }}>
+            <ShieldCheck size={16} color={C.blue} style={{ marginTop: 1 }} />
+            <p className="font-body" style={{ color: C.textDim, fontSize: 11, lineHeight: 1.5 }}>
+              Contrato verificado en BscScan · BNB Smart Chain · v1.2.0
+            </p>
+          </div>
+
+          <button className="w-full flex items-center justify-center gap-2 rounded-xl py-3" style={{ background: C.redSoft, border: `1px solid ${C.red}44`, cursor: 'pointer' }}>
+            <LogOut size={14} color={C.red} />
+            <span className="font-display" style={{ color: C.red, fontSize: 12.5, fontWeight: 600 }}>Cerrar sesión</span>
+          </button>
+        </div>
+      );
+    }
+
+    /* =========================================================
+       NAVEGACIÓN INFERIOR
+    ========================================================= */
+    function BottomNav({ active, goTo }) {
+      const items = [
+        { id: "inicio", label: "Inicio", icon: Home },
+        { id: "mercado", label: "Mercado", icon: Store },
+        { id: "operacion", label: "Operación", icon: RefreshCw },
+        { id: "billetera", label: "Billetera", icon: WalletIcon },
+        { id: "perfil", label: "Perfil", icon: User },
+      ];
+      return (
+        <div
+          className="flex items-center justify-around px-2 pt-2"
+          style={{ background: C.surface, borderTop: `1px solid ${C.border}`, paddingBottom: 22 }}
+        >
+          {items.map((it) => {
+            const isActive = active === it.id;
+            return (
+              <button key={it.id} onClick={() => goTo(it.id)} className="flex flex-col items-center gap-1" style={{ width: 56, cursor: 'pointer', background: 'none', border: 'none' }}>
+                <it.icon size={18} color={isActive ? C.blue : C.textFaint} strokeWidth={isActive ? 2.4 : 2} />
+                <span className="font-body" style={{ fontSize: 9.5, color: isActive ? C.blue : C.textFaint, fontWeight: isActive ? 600 : 400 }}>
+                  {it.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+
+    /* =========================================================
+       APP RAÍZ
+    ========================================================= */
+    function App() {
+      const [screen, setScreen] = useState("inicio");
+
+      const screens = {
+        inicio: <ScreenInicio goTo={setScreen} />,
+        mercado: <ScreenMercado goTo={setScreen} />,
+        operacion: <ScreenOperacion />,
+        billetera: <ScreenBilletera />,
+        perfil: <ScreenPerfil />,
+      };
+
+      return (
+        <div
+          className="w-full min-h-screen flex items-center justify-center py-10"
+          style={{ background: "#05070A" }}
+        >
+          <div className="flex flex-col items-center">
+            {/* Marco del teléfono */}
+            <div
+              className="relative"
+              style={{
+                width: 390, height: 844, borderRadius: 46, background: C.bg,
+                border: "10px solid #000", boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
+                overflow: "hidden",
+              }}
+            >
+              <GridBackdrop />
+              {/* Notch */}
+              <div
+                style={{
+                  position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+                  width: 120, height: 26, background: "#000", borderBottomLeftRadius: 16, borderBottomRightRadius: 16, zIndex: 20,
+                }}
+              />
+              <div className="relative flex flex-col h-full" style={{ zIndex: 10 }}>
+                <StatusBar />
+                <BrandHeader />
+                <div className="flex-1 overflow-y-auto">
+                  {screens[screen]}
+                </div>
+                <BottomNav active={screen} goTo={setScreen} />
+              </div>
+            </div>
+
+            <p className="font-body mt-5" style={{ color: "#4A5262", fontSize: 12, textAlign: "center", maxWidth: 340 }}>
+              Maqueta interactiva · Toca los íconos inferiores o los accesos de Inicio para navegar entre pantallas
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // Renderizar la aplicación
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
