@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmo Link - Link P2P</title>
+  
+  <!-- React y ReactDOM desde CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel para JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Lucide Icons desde CDN -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #05070A;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .font-body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, Fragment } = React;
+    
+    // Lucide icons
+    const {
+      Home, Store, RefreshCw, Wallet, User, Bell, ShieldCheck,
+      ArrowUpRight, ArrowDownRight, ChevronRight, MessageCircle, Copy,
+      CheckCircle2, Clock, Filter, Search, Lock, Unlock, Megaphone,
+      Fingerprint, Settings, LogOut, ChevronLeft, Wifi, Signal, BatteryFull,
+      Send, Paperclip, ShieldAlert, Landmark, Smartphone
+    } = lucide;
+    
+    // Alias para WalletIcon
+    const WalletIcon = Wallet;
+    const PhoneIcon = Smartphone;
+
+    /* ---------------------------------------------------------------
+       TOKENS — Cosmo Link / Link P2P
+    ------------------------------------------------------------------*/
+    const C = {
+      bg: "#0A0D12",
+      bgGrid: "#0D1117",
+      surface: "#12161F",
+      surface2: "#171C26",
+      border: "#232A36",
+      borderSoft: "#1A2029",
+      red: "#E5484D",
+      redSoft: "#3A1B1D",
+      blue: "#3B82F6",
+      blueSoft: "#152540",
+      green: "#22C55E",
+      greenSoft: "#12291B",
+      amber: "#E5A93B",
+      text: "#F3F5F8",
+      textDim: "#8D96A5",
+      textFaint: "#565F6D",
+    };
+
+    /* ---------------- Anillo de custodia ---------------- */
+    function CustodyRing({ pct = 70, size = 64, stroke = 6, color = C.blue, track = C.borderSoft, children }) {
+      const r = (size - stroke) / 2;
+      const c = 2 * Math.PI * r;
+      const offset = c - (pct / 100) * c;
+      return (
+        <div style={{ width: size, height: size, position: "relative" }}>
+          <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+            <circle cx={size / 2} cy={size / 2} r={r} stroke={track} strokeWidth={stroke} fill="none" />
+            <circle
+              cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none"
+              strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round"
+              style={{ transition: "stroke-dashoffset 0.6s ease" }}
+            />
+          </svg>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {children}
+          </div>
+        </div>
+      );
+    }
+
+    /* ---------------- Fondo blueprint ---------------- */
+    function GridBackdrop() {
+      return (
+        <div
+          style={{
+            position: "absolute", inset: 0, pointerEvents: "none",
+            backgroundImage: `linear-gradient(${C.borderSoft} 1px, transparent 1px), linear-gradient(90deg, ${C.borderSoft} 1px, transparent 1px)`,
+            backgroundSize: "22px 22px",
+            opacity: 0.35,
+            maskImage: "radial-gradient(ellipse 100% 60% at 50% 0%, black 40%, transparent 90%)",
+            WebkitMaskImage: "radial-gradient(ellipse 100% 60% at 50% 0%, black 40%, transparent 90%)",
+          }}
+        />
+      );
+    }
+
+    /* ---------------- Barra de estado ---------------- */
+    function StatusBar() {
+      return (
+        <div className="flex items-center justify-between px-6 pt-3 pb-1 font-mono" style={{ color: C.text, fontSize: 12 }}>
+          <span>9:41</span>
+          <div className="flex items-center gap-1">
+            <Signal size={13} />
+            <Wifi size={13} />
+            <BatteryFull size={14} />
+          </div>
+        </div>
+      );
+    }
+
+    /* ---------------- Encabezado de marca ---------------- */
+    function BrandHeader() {
+      return (
+        <div className="flex items-center gap-2 px-5 pt-1 pb-3">
+          <div
+            className="flex items-center justify-center rounded-md"
+            style={{ width: 22, height: 22, background: `linear-gradient(135deg, ${C.blue}, ${C.red})` }}
+          >
+            <span className="font-display" style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>C</span>
+          </div>
+          <span className="font-display" style={{ fontSize: 13, letterSpacing: 0.5, color: C.text, fontWeight: 600 }}>
+            Cosmo Link
+          </span>
+          <span className="font-mono" style={{ fontSize: 10, color: C.textFaint, marginLeft: 2 }}>· Link P2P</span>
+        </div>
+      );
+    }
+
+    /* ---------------- Chip de estado ---------------- */
+    function StatusChip({ label, tone = "blue" }) {
+      const map = {
+        blue: { bg: C.blueSoft, fg: C.blue },
+        red: { bg: C.redSoft, fg: C.red },
+        green: { bg: C.greenSoft, fg: C.green },
+        amber: { bg: "#2E250F", fg: C.amber },
+        gray: { bg: C.surface2, fg: C.textDim },
+      }[tone];
+      return (
+        <span
+          className="font-body inline-flex items-center rounded-full px-2 py-0.5"
+          style={{ background: map.bg, color: map.fg, fontSize: 10.5, fontWeight: 600, letterSpacing: 0.3 }}
+        >
+          {label}
+        </span>
+      );
+    }
+
+    /* =========================================================
+       PANTALLA: INICIO
+    ========================================================= */
+    function ScreenInicio({ goTo }) {
+      const actividad = [
+        { nick: "MayelinCUP", tipo: "Compra", monto: "250.00 USDT", estado: "Liberado", tono: "green", icon: ArrowDownRight },
+        { nick: "Ody_Pro", tipo: "Venta", monto: "120.00 USDT", estado: "En curso", tono: "blue", icon: Clock },
+        { nick: "Havana_Trade", tipo: "Venta", monto: "80.00 USDT", estado: "Cancelada", tono: "red", icon: ArrowUpRight },
+      ];
+      return (
+        <div className="px-5 pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="font-body" style={{ color: C.textDim, fontSize: 12 }}>Bienvenido de nuevo</p>
+              <div className="flex items-center gap-1.5">
+                <h1 className="font-display" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Ody_Pro</h1>
+                <ShieldCheck size={15} color={C.green} />
+              </div>
+            </div>
+            <button
+              className="flex items-center justify-center rounded-full"
+              style={{ width: 36, height: 36, background: C.surface, border: `1px solid ${C.border}` }}
+            >
+              <Bell size={16} color={C.textDim} />
+            </button>
+          </div>
+
+          {/* Tarjeta de balance */}
+          <div
+            className="rounded-2xl p-5 mb-4 relative overflow-hidden"
+            style={{ background: `linear-gradient(160deg, ${C.surface2} 0%, ${C.surface} 70%)`, border: `1px solid ${C.border}` }}
+          >
+            <div
+              style={{
+                position: "absolute", top: -40, right: -40, width: 140, height: 140, borderRadius: "50%",
+                background: `radial-gradient(circle, ${C.blue}22, transparent 70%)`,
+              }}
+            />
+            <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Balance total</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="font-display" style={{ color: C.text, fontSize: 32, fontWeight: 700 }}>5,000.00</span>
+              <span className="font-mono" style={{ color: C.textDim, fontSize: 13 }}>USDT</span>
+            </div>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="font-mono" style={{ color: C.amber, fontSize: 12 }}>0.084 BNB</span>
+              <span className="font-body" style={{ color: C.textFaint, fontSize: 11 }}>· gas disponible</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="rounded-xl px-3 py-2" style={{ background: C.bg, border: `1px solid ${C.borderSoft}` }}>
+                <div className="flex items-center gap-1">
+                  <Unlock size={11} color={C.green} />
+                  <span className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>Disponible</span>
+                </div>
+                <span className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>4,000.00</span>
+              </div>
+              <div className="rounded-xl px-3 py-2" style={{ background: C.bg, border: `1px solid ${C.borderSoft}` }}>
+                <div className="flex items-center gap-1">
+                  <Lock size={11} color={C.red} />
+                  <span className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>Bloqueado</span>
+                </div>
+                <span className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>1,000.00</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Acciones rápidas */}
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <button
+              onClick={() => goTo("mercado")}
+              className="rounded-xl py-3.5 flex flex-col items-start px-4"
+              style={{ background: C.blueSoft, border: `1px solid ${C.blue}55`, cursor: 'pointer' }}
+            >
+              <ArrowDownRight size={17} color={C.blue} />
+              <span className="font-display mt-2" style={{ color: C.text, fontSize: 13.5, fontWeight: 600 }}>Comprar USDT</span>
+            </button>
+            <button
+              onClick={() => goTo("mercado")}
+              className="rounded-xl py-3.5 flex flex-col items-start px-4"
+              style={{ background: C.redSoft, border: `1px solid ${C.red}55`, cursor: 'pointer' }}
+            >
+              <ArrowUpRight size={17} color={C.red} />
+              <span className="font-display mt-2" style={{ color: C.text, fontSize: 13.5, fontWeight: 600 }}>Vender USDT</span>
+            </button>
+          </div>
+
+          {/* Reputación */}
+          <div
+            className="rounded-2xl p-4 mb-5 flex items-center gap-4"
+            style={{ background: C.surface, border: `1px solid ${C.border}` }}
+          >
+            <CustodyRing pct={98} size={56} stroke={5} color={C.green}>
+              <span className="font-display" style={{ color: C.text, fontSize: 13, fontWeight: 700 }}>98%</span>
+            </CustodyRing>
+            <div className="flex-1">
+              <p className="font-body" style={{ color: C.text, fontSize: 13, fontWeight: 600 }}>Reputación de vendedor</p>
+              <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>214 operaciones · 3 años en Link P2P</p>
+            </div>
+            <ChevronRight size={16} color={C.textFaint} />
+          </div>
+
+          {/* Actividad reciente */}
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-display" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>Actividad reciente</h2>
+            <button onClick={() => goTo("operacion")} className="font-body" style={{ color: C.blue, fontSize: 11.5, cursor: 'pointer', background: 'none', border: 'none' }}>Ver todas</button>
+          </div>
+          <div className="flex flex-col gap-2">
+            {actividad.map((a, i) => (
+              <button
+                key={i}
+                onClick={() => goTo("operacion")}
+                className="rounded-xl p-3 flex items-center gap-3"
+                style={{ background: C.surface, border: `1px solid ${C.border}`, cursor: 'pointer' }}
+              >
+                <div
+                  className="flex items-center justify-center rounded-full"
+                  style={{ width: 34, height: 34, background: C.bg, border: `1px solid ${C.borderSoft}` }}
+                >
+                  <a.icon size={15} color={C.textDim} />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="font-body" style={{ color: C.text, fontSize: 12.5, fontWeight: 600 }}>{a.tipo} · {a.nick}</p>
+                  <p className="font-mono" style={{ color: C.textDim, fontSize: 11 }}>{a.monto}</p>
+                </div>
+                <StatusChip label={a.estado} tone={a.tono} />
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* =========================================================
+       PANTALLA: MERCADO
+    ========================================================= */
+    function ScreenMercado({ goTo }) {
+      const [modo, setModo] = useState("comprar");
+      const anuncios = [
+        { nick: "Havana_Trade", rating: 99, ops: 512, precio: "398", min: 100, max: 1500, metodo: "Transferencia bancaria", disp: 3200 },
+        { nick: "CubaCambio21", rating: 96, ops: 87, precio: "400", min: 50, max: 800, metodo: "Transfermóvil", disp: 640 },
+        { nick: "MayelinCUP", rating: 100, ops: 1204, precio: "401", min: 200, max: 5000, metodo: "Transferencia bancaria", disp: 8100 },
+      ];
+      return (
+        <div className="px-5 pb-6">
+          <h1 className="font-display" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Mercado</h1>
+          <p className="font-body mb-4" style={{ color: C.textDim, fontSize: 12 }}>USDT ↔ CUP</p>
+
+          {/* Segmentado comprar/vender */}
+          <div className="flex rounded-xl p-1 mb-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            {["comprar", "vender"].map((m) => (
+              <button
+                key={m}
+                onClick={() => setModo(m)}
+                className="flex-1 rounded-lg py-2 font-display"
+                style={{
+                  fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+                  background: modo === m ? (m === "comprar" ? C.blue : C.red) : "transparent",
+                  color: modo === m ? "#fff" : C.textDim,
+                  transition: "all .2s", border: 'none',
+                }}
+              >
+                {m === "comprar" ? "Comprar USDT" : "Vender USDT"}
+              </button>
+            ))}
+          </div>
+
+          {/* Filtros */}
+          <div className="flex items-center gap-2 mb-4 overflow-x-auto">
+            <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
+              <span className="font-body" style={{ color: C.text, fontSize: 11.5 }}>CUP</span>
+              <ChevronRight size={12} color={C.textFaint} style={{ transform: "rotate(90deg)" }} />
+            </button>
+            <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
+              <Filter size={11} color={C.textDim} />
+              <span className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Monto</span>
+            </button>
+            <button className="flex items-center gap-1 rounded-full px-3 py-1.5 shrink-0" style={{ background: C.surface2, border: `1px solid ${C.border}`, cursor: 'pointer' }}>
+              <span className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Reputación</span>
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {anuncios.map((a, i) => (
+              <div key={i} className="rounded-2xl p-4" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="flex items-center justify-center rounded-full font-display"
+                      style={{ width: 30, height: 30, background: C.surface2, color: C.text, fontSize: 11.5, fontWeight: 700 }}
+                    >
+                      {a.nick.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-body" style={{ color: C.text, fontSize: 12.5, fontWeight: 600 }}>{a.nick}</p>
+                      <p className="font-body" style={{ color: C.textFaint, fontSize: 10.5 }}>{a.rating}% · {a.ops} operaciones</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-mono" style={{ color: modo === "comprar" ? C.blue : C.red, fontSize: 15, fontWeight: 700 }}>{a.precio}</p>
+                    <p className="font-body" style={{ color: C.textFaint, fontSize: 10 }}>CUP / USDT</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-body" style={{ color: C.textDim, fontSize: 11 }}>Límite {a.min} – {a.max} USDT</span>
+                  <span className="font-mono" style={{ color: C.textFaint, fontSize: 10.5 }}>{a.disp.toLocaleString()} disp.</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <StatusChip label={a.metodo} tone="gray" />
+                  <button
+                    onClick={() => goTo("operacion")}
+                    className="rounded-lg px-4 py-1.5 font-display"
+                    style={{
+                      fontSize: 12, fontWeight: 600, color: "#fff", cursor: 'pointer',
+                      background: modo === "comprar" ? C.blue : C.red, border: 'none',
+                    }}
+                  >
+                    {modo === "comprar" ? "Comprar" : "Vender"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* =========================================================
+       PANTALLA: OPERACIÓN
+    ========================================================= */
+    function ScreenOperacion() {
+      const pasos = ["Creada", "Aceptada", "Pagado", "Liberado"];
+      const pasoActual = 1;
+      return (
+        <div className="px-5 pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="font-display" style={{ color: C.text, fontSize: 17, fontWeight: 600 }}>Operación #A1F9</h1>
+            <StatusChip label="ACCEPTED" tone="blue" />
+          </div>
+
+          {/* Stepper */}
+          <div className="flex items-center mb-5">
+            {pasos.map((p, i) => (
+              <Fragment key={p}>
+                <div className="flex flex-col items-center" style={{ width: 54 }}>
+                  <div
+                    className="flex items-center justify-center rounded-full font-mono"
+                    style={{
+                      width: 22, height: 22, fontSize: 10,
+                      background: i <= pasoActual ? C.blue : C.surface2,
+                      color: i <= pasoActual ? "#fff" : C.textFaint,
+                      border: `1px solid ${i <= pasoActual ? C.blue : C.border}`,
+                    }}
+                  >
+                    {i < pasoActual ? <CheckCircle2 size={12} /> : i + 1}
+                  </div>
+                  <span className="font-body mt-1" style={{ fontSize: 9, color: i <= pasoActual ? C.textDim : C.textFaint, textAlign: "center" }}>{p}</span>
+                </div>
+                {i < pasos.length - 1 && (
+                  <div className="flex-1" style={{ height: 1, background: i < pasoActual ? C.blue : C.border, marginBottom: 14 }} />
+                )}
+              </Fragment>
+            ))}
+          </div>
+
+          {/* Anillo de tiempo restante */}
+          <div className="rounded-2xl p-5 mb-4 flex items-center gap-5" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            <CustodyRing pct={62} size={78} stroke={6} color={C.amber}>
+              <div className="text-center">
+                <p className="font-mono" style={{ color: C.text, fontSize: 14, fontWeight: 700, lineHeight: 1 }}>18:32</p>
+                <p className="font-body" style={{ color: C.textFaint, fontSize: 8 }}>restantes</p>
+              </div>
+            </CustodyRing>
+            <div>
+              <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>Escrow activo</p>
+              <p className="font-body" style={{ color: C.text, fontSize: 12.5, maxWidth: 160 }}>
+                Los USDT quedan bloqueados en el contrato hasta confirmar el pago.
+              </p>
+            </div>
+          </div>
+
+          {/* Detalle */}
+          <div className="rounded-2xl p-4 mb-4" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            {[
+              ["Contraparte", "Havana_Trade"],
+              ["Nombre real", "Yoandry P. — visible solo aquí"],
+              ["Cantidad", "250.00 USDT"],
+              ["Precio", "398 CUP / USDT"],
+              ["Total a pagar", "99,500 CUP"],
+              ["Método de pago", "Transferencia bancaria"],
+            ].map(([label, val], i, arr) => (
+              <div
+                key={label}
+                className="flex items-center justify-between py-2.5"
+                style={{ borderBottom: i < arr.length - 1 ? `1px solid ${C.borderSoft}` : "none" }}
+              >
+                <span className="font-body" style={{ color: C.textDim, fontSize: 12 }}>{label}</span>
+                <span className="font-body" style={{ color: C.text, fontSize: 12, fontWeight: 600, textAlign: "right", maxWidth: 170 }}>{val}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Chat preview */}
+          <div className="rounded-2xl p-3.5 mb-5 flex items-center gap-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            <div className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: C.blueSoft }}>
+              <MessageCircle size={14} color={C.blue} />
+            </div>
+            <div className="flex-1">
+              <p className="font-body" style={{ color: C.text, fontSize: 12, fontWeight: 600 }}>Havana_Trade</p>
+              <p className="font-body" style={{ color: C.textDim, fontSize: 11 }}>"Envío el comprobante en 2 min…"</p>
+            </div>
+            <ChevronRight size={15} color={C.textFaint} />
+          </div>
+
+          <div className="flex gap-3">
+            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.text, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              Abrir chat
+            </button>
+            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.blue, color: "#fff", fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none' }}>
+              He pagado
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    /* =========================================================
+       PANTALLA: BILLETERA
+    ========================================================= */
+    function ScreenBilletera() {
+      const historial = [
+        { tipo: "Depósito", monto: "+1,200.00 USDT", icon: ArrowDownRight, tono: "green" },
+        { tipo: "Bloqueo escrow", monto: "-250.00 USDT", icon: Lock, tono: "amber" },
+        { tipo: "Retiro", monto: "-400.00 USDT", icon: ArrowUpRight, tono: "red" },
+        { tipo: "Liberación escrow", monto: "+120.00 USDT", icon: Unlock, tono: "green" },
+      ];
+      return (
+        <div className="px-5 pb-6">
+          <h1 className="font-display mb-4" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Billetera</h1>
+
+          <div className="rounded-2xl p-5 mb-3" style={{ background: `linear-gradient(160deg, ${C.surface2}, ${C.surface})`, border: `1px solid ${C.border}` }}>
+            <p className="font-body" style={{ color: C.textDim, fontSize: 11.5 }}>USDT · BEP-20</p>
+            <div className="flex items-baseline gap-2">
+              <span className="font-display" style={{ color: C.text, fontSize: 28, fontWeight: 700 }}>5,000.00</span>
+              <span className="font-mono" style={{ color: C.textDim, fontSize: 12 }}>USDT</span>
+            </div>
+            <div className="flex items-center gap-2 mt-2 font-mono" style={{ fontSize: 10, color: C.textFaint }}>
+              <span>0xA3f1…9C2e</span>
+              <Copy size={11} />
+            </div>
+          </div>
+
+          <div className="rounded-xl p-3.5 mb-4 flex items-center justify-between" style={{ background: C.redSoft, border: `1px solid ${C.red}44` }}>
+            <div className="flex items-center gap-2">
+              <ShieldAlert size={16} color={C.red} />
+              <div>
+                <p className="font-body" style={{ color: C.text, fontSize: 11.5, fontWeight: 600 }}>BNB para gas bajo</p>
+                <p className="font-mono" style={{ color: C.textDim, fontSize: 10 }}>0.004 BNB disponibles</p>
+              </div>
+            </div>
+            <button className="font-display" style={{ color: C.red, fontSize: 11, fontWeight: 700, cursor: 'pointer', background: 'none', border: 'none' }}>Añadir</button>
+          </div>
+
+          <div className="flex gap-3 mb-5">
+            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.blue, color: "#fff", fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none' }}>Depositar</button>
+            <button className="flex-1 rounded-xl py-3 font-display" style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.text, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Retirar</button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-5">
+            {[
+              ["Disponible", "4,000.00", C.green],
+              ["Bloqueado", "1,000.00", C.red],
+              ["Anunciado", "3,200.00", C.blue],
+              ["Retirable", "4,000.00", C.text],
+            ].map(([label, val, col]) => (
+              <div key={label} className="rounded-xl p-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+                <p className="font-body" style={{ color: C.textDim, fontSize: 10.5 }}>{label}</p>
+                <p className="font-mono" style={{ color: col, fontSize: 13.5, fontWeight: 700 }}>{val}</p>
+              </div>
+            ))}
+          </div>
+
+          <h2 className="font-display mb-2" style={{ color: C.text, fontSize: 14, fontWeight: 600 }}>Historial</h2>
+          <div className="flex flex-col gap-2">
+            {historial.map((h, i) => (
+              <div key={i} className="rounded-xl p-3 flex items-center gap-3" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+                <div className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: C.bg, border: `1px solid ${C.borderSoft}` }}>
+                  <h.icon size={14} color={h.tono === "green" ? C.green : h.tono === "red" ? C.red : C.amber} />
+                </div>
+                <span className="font-body flex-1" style={{ color: C.text, fontSize: 12.5, fontWeight: 500 }}>{h.tipo}</span>
+                <span className="font-mono" style={{ color: h.monto[0] === "+" ? C.green : C.textDim, fontSize: 12 }}>{h.monto}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* =========================================================
+       PANTALLA: PERFIL
+    ========================================================= */
+    function ScreenPerfil() {
+      const menu = [
+        { icon: Fingerprint, label: "Seguridad y seed" },
+        { icon: Megaphone, label: "Suscripción — Plan Pro" },
+        { icon: Settings, label: "Configuración" },
+      ];
+      return (
+        <div className="px-5 pb-6">
+          <h1 className="font-display mb-4" style={{ color: C.text, fontSize: 19, fontWeight: 600 }}>Perfil</h1>
+
+          <div className="rounded-2xl p-5 mb-4 flex flex-col items-center" style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+            <CustodyRing pct={98} size={88} stroke={6} color={C.blue}>
+              <div
+                className="flex items-center justify-center rounded-full font-display"
+                style={{ width: 68, height: 68, background: C.surface2, color: C.text, fontSize: 20, fontWeight: 700 }}
+              >
+                OP
+              </div>
+            </CustodyRing>
+            <div className="flex items-center gap-1.5 mt-3">
+              <h2 className="font-display" style={{ color: C.text, fontSize: 16, fontWeight: 700 }}>Ody_Pro</h2>
+              <ShieldCheck size={14} color={C.green} />
+            </div>
+            <p className="font-body" style={{ color: C.textFaint, fontSize: 11 }}>Miembro desde 2023 · Nombre real oculto</p>
+
+            <div className="flex gap-2 mt-3">
+              <StatusChip label="KYC aprobado" tone="green" />
+              <StatusChip label="Plan Pro" tone="blue" />
+            </div>
+
+            <div className="flex w-full mt-4 pt-4" style={{ borderTop: `1px solid ${C.borderSoft}`
